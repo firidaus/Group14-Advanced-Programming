@@ -1,0 +1,9 @@
+node_modules/
+package-lock.json
+dist/
+/.env
+__pycache__/
+*.pyc
+db.sqlite3
+.venv/
+core/static/css/styles.css

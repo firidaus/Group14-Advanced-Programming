@@ -1,0 +1,3 @@
+django
+# Optional: use django-tailwind to manage Tailwind from Django (pip install django-tailwind)
+django-tailwind

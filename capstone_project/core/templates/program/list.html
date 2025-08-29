@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-semibold">Programs</h1>
+    <a href="{% url 'core:program_create' %}" class="inline-block bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Create Program</a>
+  </div>
+
+  <div class="grid gap-4">
+    {% if programs %}
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for p in programs %}
+          <article class="bg-white border rounded shadow-sm p-4 hover:shadow-lg transition">
+            <h2 class="text-lg font-semibold mb-1"><a href="{% url 'core:program_detail' p.ProgramId %}" class="hover:underline">{{ p.name }}</a></h2>
+            <p class="text-sm text-gray-600 mb-3">{{ p.description|default:'No description provided.' }}</p>
+            <div class="text-xs text-gray-500">Alignment: {{ p.national_alignment|default:'N/A' }}</div>
+            <div class="mt-3 flex items-center justify-between">
+              <div class="text-sm text-gray-500">Status: {% if p.active %}<span class="text-green-600">Active</span>{% else %}<span class="text-red-600">Inactive</span>{% endif %}</div>
+              <a href="{% url 'core:program_detail' p.ProgramId %}" class="text-indigo-600 hover:underline">View</a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="bg-yellow-50 border-l-4 border-yellow-300 p-4">No programs yet. <a href="{% url 'core:program_create' %}" class="text-indigo-600 hover:underline">Create one</a>.</div>
+    {% endif %}
+  </div>
+
+{% endblock %}
