@@ -11,32 +11,32 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700">Name</label>
-          {{ form.name|as_widget(attrs={'class': 'mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}) }}
+          {{ form.name }}
           {{ form.name.errors }}
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700">National alignment</label>
-          {{ form.national_alignment|as_widget(attrs={'class': 'mt-1 block w-full rounded border-gray-300 shadow-sm'}) }}
+          {{ form.national_alignment }}
           {{ form.national_alignment.errors }}
         </div>
       </div>
 
       <div>
         <label class="block text-sm font-medium text-gray-700">Description</label>
-        {{ form.description|as_widget(attrs={'class': 'mt-1 block w-full rounded border-gray-300 shadow-sm', 'rows': 4}) }}
+        {{ form.description }}
         {{ form.description.errors }}
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700">Focus areas</label>
-          {{ form.focus_areas|as_widget(attrs={'class': 'mt-1 block w-full rounded border-gray-300 shadow-sm'}) }}
+          {{ form.focus_areas }}
           {{ form.focus_areas.errors }}
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700">Phases</label>
-          {{ form.phases|as_widget(attrs={'class': 'mt-1 block w-full rounded border-gray-300 shadow-sm'}) }}
+          {{ form.phases }}
           {{ form.phases.errors }}
         </div>
       </div>
@@ -44,12 +44,12 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700">Start date</label>
-          {{ form.start_date|as_widget(attrs={'class': 'mt-1 block w-full rounded border-gray-300 shadow-sm'}) }}
+          {{ form.start_date }}
           {{ form.start_date.errors }}
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700">End date</label>
-          {{ form.end_date|as_widget(attrs={'class': 'mt-1 block w-full rounded border-gray-300 shadow-sm'}) }}
+          {{ form.end_date }}
           {{ form.end_date.errors }}
         </div>
       </div>
