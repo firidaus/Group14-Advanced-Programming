@@ -1,0 +1,38 @@
+[
+  {
+    "model": "core.facility",
+    "pk": 1,
+    "fields": {
+      "name": "Unipod Engineering Lab",
+      "location": "Kampala",
+      "description": "State-of-the-art engineering laboratory for robotics and automation.",
+      "partner": "UniPod",
+      "facility_type": "Laboratory",
+      "capabilities": "CNC, Materials Testing"
+    }
+  },
+  {
+    "model": "core.facility",
+    "pk": 2,
+    "fields": {
+      "name": "UIRI Tech Workshop",
+      "location": "Kampala",
+      "description": "Advanced workshop for electronics and prototyping.",
+      "partner": "UIRI",
+      "facility_type": "Workshop",
+      "capabilities": "PCB Fabrication, Materials Testing"
+    }
+  },
+  {
+    "model": "core.facility",
+    "pk": 3,
+    "fields": {
+      "name": "Lwera Testing Center",
+      "location": "Lwera",
+      "description": "Materials testing and analysis center.",
+      "partner": "Lwera",
+      "facility_type": "Testing Center",
+      "capabilities": "Materials Testing"
+    }
+  }
+]
