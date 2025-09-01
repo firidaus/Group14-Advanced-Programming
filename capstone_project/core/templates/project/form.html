@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if project %}Edit Project{% else %}Create Project{% endif %}{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 rounded shadow">
+    <h3 class="text-xl font-bold mb-4">{% if project %}Edit Project{% else %}Create Project{% endif %}</h3>
+
+    <form method="post">{% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>{{ form.title.label_tag }}{{ form.title }}</div>
+            <div>{{ form.program.label_tag }}{{ form.program }}</div>
+            <div>{{ form.facility.label_tag }}{{ form.facility }}</div>
+            <div>{{ form.nature_of_project.label_tag }}{{ form.nature_of_project }}</div>
+            <div class="md:col-span-2">{{ form.description.label_tag }}{{ form.description }}</div>
+            <div>{{ form.innovation_focus.label_tag }}{{ form.innovation_focus }}</div>
+            <div>{{ form.prototype_stage.label_tag }}{{ form.prototype_stage }}</div>
+            <div class="md:col-span-2">{{ form.testing_requirements.label_tag }}{{ form.testing_requirements }}</div>
+            <div class="md:col-span-2">{{ form.commercialization_plan.label_tag }}{{ form.commercialization_plan }}</div>
+        </div>
+        <div class="mt-4">
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Save</button>
+            <a href="{% url 'core:project_list' %}" class="ml-2 text-gray-700 hover:underline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
