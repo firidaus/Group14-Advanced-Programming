@@ -25,3 +25,23 @@ urlpatterns = [
     path('projects/<int:pk>/delete/', pr.project_delete, name='project_delete'),
 ]
 
+from django.urls import path
+from .views import (
+    EquipmentListView,
+    FacilityEquipmentListView,
+    EquipmentDetailView,
+    EquipmentCreateView,
+    EquipmentUpdateView,
+    EquipmentDeleteView,
+    EquipmentSearchView,
+)
+
+urlpatterns = [
+    path('equipment/', EquipmentListView.as_view(), name='equipment_list'),
+    path('equipment/search/', EquipmentSearchView.as_view(), name='equipment_search'),
+    path('equipment/<int:pk>/', EquipmentDetailView.as_view(), name='equipment_detail'),
+    path('equipment/create/', EquipmentCreateView.as_view(), name='equipment_create'),
+    path('equipment/<int:pk>/edit/', EquipmentUpdateView.as_view(), name='equipment_update'),
+    path('equipment/<int:pk>/delete/', EquipmentDeleteView.as_view(), name='equipment_delete'),
+    path('facility/<int:facility_id>/equipment/', FacilityEquipmentListView.as_view(), name='facility_equipment_list'),
+]
