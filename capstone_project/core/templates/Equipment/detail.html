@@ -1,0 +1,13 @@
+{% extends 'base.html' %} <!-- Remove if no base.html -->
+{% block content %}
+<h1>{{ equipment.name }}</h1>
+<p><strong>Facility:</strong> {{ equipment.facility.name }}</p>
+<p><strong>Description:</strong> {{ equipment.description }}</p>
+<p><strong>Capabilities:</strong> {{ equipment.capabilities }}</p>
+<p><strong>Inventory Code:</strong> {{ equipment.inventory_code }}</p>
+<p><strong>Usage Domain:</strong> {{ equipment.usage_domain }}</p>
+<p><strong>Support Phase:</strong> {{ equipment.support_phase }}</p>
+<a href="{% url 'equipment_update' equipment.pk %}">Edit</a>
+<a href="{% url 'equipment_delete' equipment.pk %}">Delete</a>
+<a href="{% url 'equipment_list' %}">Back to List</a>
+{% endblock %}
