@@ -7,7 +7,7 @@
 <p><strong>Inventory Code:</strong> {{ equipment.inventory_code }}</p>
 <p><strong>Usage Domain:</strong> {{ equipment.usage_domain }}</p>
 <p><strong>Support Phase:</strong> {{ equipment.support_phase }}</p>
-<a href="{% url 'equipment_update' equipment.pk %}">Edit</a>
-<a href="{% url 'equipment_delete' equipment.pk %}">Delete</a>
-<a href="{% url 'equipment_list' %}">Back to List</a>
+<a href="{% url 'core:equipment_update' equipment.pk %}">Edit</a>
+<a href="{% url 'core:equipment_delete' equipment.pk %}">Delete</a>
+<a href="{% url 'core:equipment_list' %}">Back to List</a>
 {% endblock %}

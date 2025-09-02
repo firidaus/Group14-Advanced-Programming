@@ -5,13 +5,13 @@
     {% for equipment in equipments %}
     <li>
         {{ equipment.name }} ({{ equipment.usage_domain }}) - Facility: {{ equipment.facility.name }}
-        <a href="{% url 'equipment_detail' equipment.pk %}">View</a>
-        <a href="{% url 'equipment_update' equipment.pk %}">Edit</a>
-        <a href="{% url 'equipment_delete' equipment.pk %}">Delete</a>
+        <a href="{% url 'core:equipment_detail' equipment.pk %}">View</a>
+        <a href="{% url 'core:equipment_update' equipment.pk %}">Edit</a>
+        <a href="{% url 'core:equipment_delete' equipment.pk %}">Delete</a>
     </li>
     {% empty %}
     <li>No equipment found.</li>
     {% endfor %}
 </ul>
-<a href="{% url 'equipment_create' %}">Create New Equipment</a>
+<a href="{% url 'core:equipment_create' %}">Create New Equipment</a>
 {% endblock %}

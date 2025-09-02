@@ -3,15 +3,7 @@ from core.controllers import program_controller as pc
 from core.controllers import Facility_controller as fa
 from core.controllers import project_controller as pr
 from core.controllers import service_controller as sc
-from .views import (
-    EquipmentListView,
-    FacilityEquipmentListView,
-    EquipmentDetailView,
-    EquipmentCreateView,
-    EquipmentUpdateView,
-    EquipmentDeleteView,
-    EquipmentSearchView,
-)
+from core.controllers import Equipment_controller as eq
 
 app_name = 'core'
 
@@ -46,11 +38,11 @@ urlpatterns = [
     path('services/<int:pk>/delete/', sc.service_delete, name='service_delete'),
 
     # Equipments
-    path('equipment/', EquipmentListView.as_view(), name='equipment_list'),
-    path('equipment/search/', EquipmentSearchView.as_view(), name='equipment_search'),
-    path('equipment/<int:pk>/', EquipmentDetailView.as_view(), name='equipment_detail'),
-    path('equipment/create/', EquipmentCreateView.as_view(), name='equipment_create'),
-    path('equipment/<int:pk>/edit/', EquipmentUpdateView.as_view(), name='equipment_update'),
-    path('equipment/<int:pk>/delete/', EquipmentDeleteView.as_view(), name='equipment_delete'),
-    path('facility/<int:facility_id>/equipment/', FacilityEquipmentListView.as_view(), name='facility_equipment_list'),
+    path('equipment/', eq.equipment_list, name='equipment_list'),
+    path('equipment/search/', eq.equipment_search, name='equipment_search'),
+    path('equipment/<int:pk>/', eq.equipment_detail, name='equipment_detail'),
+    path('equipment/create/', eq.equipment_create, name='equipment_create'),
+    path('equipment/<int:pk>/edit/', eq.equipment_update, name='equipment_update'),
+    path('equipment/<int:pk>/delete/', eq.equipment_delete, name='equipment_delete'),
+    path('facility/<int:facility_id>/equipment/', eq.equipment_by_facility, name='facility_equipment_list'),
 ]

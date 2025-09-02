@@ -9,7 +9,7 @@
     {% for equipment in equipments %}
     <li>
         {{ equipment.name }} ({{ equipment.usage_domain }}) - Facility: {{ equipment.facility.name }}
-        <a href="{% url 'equipment_detail' equipment.pk %}">View</a>
+        <a href="{% url 'core:equipment_detail' equipment.pk %}">View</a>
     </li>
     {% empty %}
     <li>No results found.</li>
