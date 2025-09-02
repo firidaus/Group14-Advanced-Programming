@@ -2,6 +2,8 @@ from django.urls import path
 from core.controllers import program_controller as pc
 from core.controllers import Facility_controller as fa
 from core.controllers import project_controller as pr
+from core.controllers import service_controller as sc
+
 
 app_name = 'core'
 
@@ -23,5 +25,12 @@ urlpatterns = [
     path('projects/<int:pk>/', pr.project_detail, name='project_detail'),
     path('projects/<int:pk>/edit/', pr.project_update, name='project_update'),
     path('projects/<int:pk>/delete/', pr.project_delete, name='project_delete'),
+
+    path('services/', sc.service_list, name='service_list'),
+    path('services/create/', sc.service_create, name='service_create'),
+    path('services/<int:pk>/', sc.service_detail, name='service_detail'),
+    path('services/<int:pk>/edit/', sc.service_update, name='service_update'),
+    path('services/<int:pk>/delete/', sc.service_delete, name='service_delete'),
 ]
+
 

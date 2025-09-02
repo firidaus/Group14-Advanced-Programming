@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white shadow rounded-lg p-6 max-w-md mx-auto">
+    <div class="text-center">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+            <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+        </div>
+        
+        <h1 class="text-lg font-medium text-gray-900 mb-2">Delete Service</h1>
+        <p class="text-sm text-gray-500 mb-6">
+            Are you sure you want to delete "<strong>{{ service.name }}</strong>"? This action cannot be undone.
+        </p>
+        
+        <div class="bg-gray-50 p-4 rounded-lg mb-6 text-left">
+            <h3 class="text-sm font-medium text-gray-900 mb-2">Service Details:</h3>
+            <dl class="text-sm text-gray-600 space-y-1">
+                <div><dt class="inline font-medium">Name:</dt> {{ service.name }}</div>
+                <div><dt class="inline font-medium">Category:</dt> {{ service.category }}</div>
+                <div><dt class="inline font-medium">Facility:</dt> {{ service.FacilityId.name }}</div>
+            </dl>
+        </div>
+        
+        <form method="post" class="space-y-3">
+            {% csrf_token %}
+            <div class="flex space-x-3">
+                <a href="{% url 'core:service_detail' service.ServiceId %}" 
+                   class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 text-center">
+                    Cancel
+                </a>
+                <button type="submit" 
+                        class="flex-1 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                    Delete Service
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

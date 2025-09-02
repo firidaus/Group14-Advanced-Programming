@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Program
+from .models.service import Service
 
 
 
@@ -13,3 +14,10 @@ class FacilityAdmin(admin.ModelAdmin):
     search_fields = ('name', 'location', 'partner', 'facility_type')
     list_filter = ('partner', 'facility_type')
     filter_horizontal = ('capabilities',)
+#service code
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ('ServiceId', 'name', 'category', 'skill_type', 'FacilityId')
+    list_filter = ('category', 'skill_type', 'FacilityId')
+    search_fields = ('name', 'description', 'FacilityId__name')
+    ordering = ('ServiceId',)
