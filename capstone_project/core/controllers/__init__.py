@@ -1,1 +1,1 @@
-from .program_controller import *
+# Empty init file - controllers are imported directly in urls.py

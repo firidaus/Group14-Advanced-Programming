@@ -1,65 +1,90 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="flex justify-center mt-10">
-  <div class="w-full max-w-3xl bg-white shadow-md rounded-lg p-6">
-    <h1 class="text-2xl font-bold mb-6 text-gray-800 text-center">
-      {% if facility %}Edit{% else %}New{% endif %} Facility
+<div class="max-w-3xl mx-auto">
+  <!-- Compact Header -->
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-bold text-gray-900">
+      {% if form.instance.pk %}Edit Facility{% else %}Create Facility{% endif %}
     </h1>
+    <a href="{% url 'core:facility_list' %}" class="text-gray-600 hover:text-gray-800">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
 
-    <form method="post" class="space-y-4">
+  <!-- Compact Form -->
+  <div class="bg-white rounded-lg shadow-sm p-4">
+    <form method="post" class="space-y-3">
       {% csrf_token %}
-      {{ form.non_field_errors }}
+      
+      {% if form.non_field_errors %}
+        <div class="bg-red-50 border border-red-200 rounded p-2">
+          <span class="text-red-700 text-sm">Please correct the errors below:</span>
+        </div>
+      {% endif %}
 
-      <!-- Row 1: Name & Location -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Name</label>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <!-- Name -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.name.id_for_label }}">Name *</label>
           {{ form.name }}
-          {{ form.name.errors }}
+          {% if form.name.errors %}
+            <div class="errorlist">{{ form.name.errors }}</div>
+          {% endif %}
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Location</label>
+
+        <!-- Location -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.location.id_for_label }}">Location</label>
           {{ form.location }}
-          {{ form.location.errors }}
+          {% if form.location.errors %}
+            <div class="errorlist">{{ form.location.errors }}</div>
+          {% endif %}
         </div>
-      </div>
 
-      <!-- Row 2: Partner & Facility Type -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Partner Organization</label>
+        <!-- Partner -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.partner.id_for_label }}">Partner Organization</label>
           {{ form.partner }}
-          {{ form.partner.errors }}
+          {% if form.partner.errors %}
+            <div class="errorlist">{{ form.partner.errors }}</div>
+          {% endif %}
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Facility Type</label>
+
+        <!-- Facility Type -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.facility_type.id_for_label }}">Facility Type</label>
           {{ form.facility_type }}
-          {{ form.facility_type.errors }}
+          {% if form.facility_type.errors %}
+            <div class="errorlist">{{ form.facility_type.errors }}</div>
+          {% endif %}
         </div>
       </div>
 
-      <!-- Row 3: Capabilities -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Capabilities</label>
+      <!-- Full width fields -->
+      <div class="form-group">
+        <label class="form-label" for="{{ form.capabilities.id_for_label }}">Capabilities</label>
         {{ form.capabilities }}
-        {{ form.capabilities.errors }}
+        {% if form.capabilities.errors %}
+          <div class="errorlist">{{ form.capabilities.errors }}</div>
+        {% endif %}
       </div>
 
-      <!-- Row 4: Description -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Description</label>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.description.id_for_label }}">Description</label>
         {{ form.description }}
-        {{ form.description.errors }}
+        {% if form.description.errors %}
+          <div class="errorlist">{{ form.description.errors }}</div>
+        {% endif %}
       </div>
 
-      <!-- Buttons -->
-      <div class="flex items-center space-x-3 pt-4">
-        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded">
-          Save
+      <!-- Compact Action Buttons -->
+      <div class="flex gap-2 pt-2">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 text-sm rounded hover:bg-blue-700">
+          <i class="bi bi-check"></i> {% if form.instance.pk %}Update{% else %}Create{% endif %}
         </button>
-        <a href="{% url 'core:facility_list' %}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded">
-          Cancel
+        <a href="{% url 'core:facility_list' %}" class="bg-gray-500 text-white px-4 py-2 text-sm rounded hover:bg-gray-600">
+          <i class="bi bi-x"></i> Cancel
         </a>
       </div>
     </form>

@@ -4,7 +4,6 @@ from core.controllers import Facility_controller as fa
 from core.controllers import project_controller as pr
 from core.controllers import service_controller as sc
 
-
 app_name = 'core'
 
 urlpatterns = [
@@ -31,6 +30,5 @@ urlpatterns = [
     path('services/<int:pk>/', sc.service_detail, name='service_detail'),
     path('services/<int:pk>/edit/', sc.service_update, name='service_update'),
     path('services/<int:pk>/delete/', sc.service_delete, name='service_delete'),
+
 ]
-
-
