@@ -4,6 +4,7 @@ from core.controllers import Facility_controller as fa
 from core.controllers import project_controller as pr
 from core.controllers import service_controller as sc
 from core.controllers import Equipment_controller as eq
+from core.controllers import participant_controller as pa
 
 app_name = 'core'
 
@@ -45,4 +46,17 @@ urlpatterns = [
     path('equipment/<int:pk>/edit/', eq.equipment_update, name='equipment_update'),
     path('equipment/<int:pk>/delete/', eq.equipment_delete, name='equipment_delete'),
     path('facility/<int:facility_id>/equipment/', eq.equipment_by_facility, name='facility_equipment_list'),
+
+    path('participants/', pa.participant_list, name='participant_list'),
+    path('participants/create/', pa.participant_create, name='participant_create'),
+    path('participants/<int:pk>/', pa.participant_detail, name='participant_detail'),
+    path('participants/<int:pk>/edit/', pa.participant_update, name='participant_update'),
+    path('participants/<int:pk>/delete/', pa.participant_delete, name='participant_delete'),
+
+
+    path('projects/<int:project_id>/participants/<int:participant_id>/assign/',
+         pa.assign_participant, name='assign_participant'),
+    path('projects/<int:project_id>/participants/<int:participant_id>/remove/',
+         pa.remove_participant, name='remove_participant'),
 ]
+

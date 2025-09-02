@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Participant Details{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 rounded shadow">
+    <h2 class="text-2xl font-bold mb-4">{{ participant.full_name }}</h2>
+
+    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+        <div>
+            <dt class="font-semibold text-gray-600">Email</dt>
+            <dd>{{ participant.email }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-gray-600">Affiliation</dt>
+            <dd>{{ participant.affiliation }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-gray-600">Specialization</dt>
+            <dd>{{ participant.get_specialization_display }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-gray-600">Cross-Skill Trained</dt>
+            <dd>
+                {% if participant.cross_skill_trained %}
+                    ✅ Yes
+                {% else %}
+                    ❌ No
+                {% endif %}
+            </dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-gray-600">Institution</dt>
+            <dd>{{ participant.get_institution_display }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-gray-600">Project</dt>
+            <dd>{{ participant.project.title }}</dd>
+        </div>
+    </dl>
+
+   <div class="space-x-2">
+    
+  <a href="{% url 'core:participant_update' participant.pk %}" class="bg-indigo-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+    <i class="bi bi-pencil"></i> Edit
+  </a>
+  <a href="{% url 'core:participant_list' %}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+    Cancel
+  </a>
+  <a href="{% url 'core:participant_delete' participant.pk %}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+    Delete
+  </a>
+</div>
+</div>
+{% endblock %}
