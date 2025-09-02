@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Delete Participant</h1>
+<p>Are you sure you want to delete "<strong>{{ participant.name }}</strong>"?</p>
+<form method="post" class="mt-4">
+  {% csrf_token %}
+  <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+    Confirm Delete
+  </button>
+  <a href="{% url 'core:participant_detail' participant.pk %}" class="ml-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+    Cancel
+  </a>
+</form>
+{% endblock %}
