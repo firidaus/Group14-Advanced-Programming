@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+  <!-- Compact Header -->
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-bold text-gray-900">
+      {% if form.instance.pk %}Edit Project{% else %}Create Project{% endif %}
+    </h1>
+    <a href="{% url 'core:project_list' %}" class="text-gray-600 hover:text-gray-800">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+
+  <!-- Compact Form -->
+  <div class="bg-white rounded-lg shadow-sm p-4">
+    <form method="post" class="space-y-3">
+      {% csrf_token %}
+      
+      {% if form.non_field_errors %}
+        <div class="bg-red-50 border border-red-200 rounded p-2">
+          <span class="text-red-700 text-sm">Please correct the errors below:</span>
+        </div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <!-- Title -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.title.id_for_label }}">Project Title *</label>
+          {{ form.title }}
+          {% if form.title.errors %}
+            <div class="errorlist">{{ form.title.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Program -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.program.id_for_label }}">Program *</label>
+          {{ form.program }}
+          {% if form.program.errors %}
+            <div class="errorlist">{{ form.program.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Facility -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.facility.id_for_label }}">Facility *</label>
+          {{ form.facility }}
+          {% if form.facility.errors %}
+            <div class="errorlist">{{ form.facility.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Nature of Project -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.nature_of_project.id_for_label }}">Nature of Project</label>
+          {{ form.nature_of_project }}
+          {% if form.nature_of_project.errors %}
+            <div class="errorlist">{{ form.nature_of_project.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Innovation Focus -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.innovation_focus.id_for_label }}">Innovation Focus</label>
+          {{ form.innovation_focus }}
+          {% if form.innovation_focus.errors %}
+            <div class="errorlist">{{ form.innovation_focus.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Prototype Stage -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.prototype_stage.id_for_label }}">Prototype Stage</label>
+          {{ form.prototype_stage }}
+          {% if form.prototype_stage.errors %}
+            <div class="errorlist">{{ form.prototype_stage.errors }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Full width fields -->
+      <div class="form-group">
+        <label class="form-label" for="{{ form.description.id_for_label }}">Description</label>
+        {{ form.description }}
+        {% if form.description.errors %}
+          <div class="errorlist">{{ form.description.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.testing_requirements.id_for_label }}">Testing Requirements</label>
+        {{ form.testing_requirements }}
+        {% if form.testing_requirements.errors %}
+          <div class="errorlist">{{ form.testing_requirements.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.commercialization_plan.id_for_label }}">Commercialization Plan</label>
+        {{ form.commercialization_plan }}
+        {% if form.commercialization_plan.errors %}
+          <div class="errorlist">{{ form.commercialization_plan.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Compact Action Buttons -->
+      <div class="flex gap-2 pt-2">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 text-sm rounded hover:bg-blue-700">
+          <i class="bi bi-check"></i> {% if form.instance.pk %}Update{% else %}Create{% endif %}
+        </button>
+        <a href="{% url 'core:project_list' %}" class="bg-gray-500 text-white px-4 py-2 text-sm rounded hover:bg-gray-600">
+          <i class="bi bi-x"></i> Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

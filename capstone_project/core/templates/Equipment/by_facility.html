@@ -1,0 +1,17 @@
+{% extends 'base.html' %} <!-- Remove if no base.html -->
+{% block content %}
+<h1>Equipment at {{ facility.name }}</h1>
+<ul>
+    {% for equipment in object_list %}
+    <li>
+        {{ equipment.name }} ({{ equipment.usage_domain }})
+        <a href="{% url 'equipment_detail' equipment.pk %}">View</a>
+        <a href="{% url 'equipment_update' equipment.pk %}">Edit</a>
+        <a href="{% url 'equipment_delete' equipment.pk %}">Delete</a>
+    </li>
+    {% empty %}
+    <li>No equipment at this facility.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'equipment_create' %}">Create New Equipment</a>
+{% endblock %}
