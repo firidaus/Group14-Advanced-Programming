@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white shadow rounded-lg p-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">
+            {% if service %}Edit Service{% else %}Create New Service{% endif %}
+        </h1>
+        <p class="text-gray-600 mt-2">
+            {% if service %}Update the service information below{% else %}Fill in the details to create a new service{% endif %}
+        </p>
+    </div>
+    
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Service Name *
+                </label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.name.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <div>
+                <label for="{{ form.FacilityId.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Facility *
+                </label>
+                {{ form.FacilityId }}
+                {% if form.FacilityId.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.FacilityId.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Category *
+                </label>
+                {{ form.category }}
+                {% if form.category.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.category.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <div>
+                <label for="{{ form.skill_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    Skill Type *
+                </label>
+                {{ form.skill_type }}
+                {% if form.skill_type.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.skill_type.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div>
+            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                Description *
+            </label>
+            {{ form.description }}
+            {% if form.description.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.description.errors.0 }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="flex justify-between items-center pt-6 border-t">
+            <a href="{% url 'core:service_list' %}" class="text-gray-600 hover:text-gray-800">
+                Cancel
+            </a>
+            <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">
+                {% if service %}Update Service{% else %}Create Service{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

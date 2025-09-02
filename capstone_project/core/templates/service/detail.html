@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white shadow rounded-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">{{ service.name }}</h1>
+        <div class="space-x-2">
+            <a href="{% url 'core:service_update' service.ServiceId %}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Edit</a>
+            <a href="{% url 'core:service_delete' service.ServiceId %}" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete</a>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Service Information</h2>
+            <dl class="space-y-3">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Service ID</dt>
+                    <dd class="text-sm text-gray-900">{{ service.ServiceId }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Name</dt>
+                    <dd class="text-sm text-gray-900">{{ service.name }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Category</dt>
+                    <dd class="text-sm text-gray-900">
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">{{ service.category }}</span>
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Skill Type</dt>
+                    <dd class="text-sm text-gray-900">
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">{{ service.skill_type }}</span>
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Description</dt>
+                    <dd class="text-sm text-gray-900">{{ service.description }}</dd>
+                </div>
+            </dl>
+        </div>
+        
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Facility Information</h2>
+            <dl class="space-y-3">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Facility</dt>
+                    <dd class="text-sm text-gray-900">{{ service.FacilityId.name }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Location</dt>
+                    <dd class="text-sm text-gray-900">{{ service.FacilityId.location }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Partner</dt>
+                    <dd class="text-sm text-gray-900">{{ service.FacilityId.partner }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Facility Type</dt>
+                    <dd class="text-sm text-gray-900">{{ service.FacilityId.facility_type }}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+    
+    <div class="mt-6 pt-6 border-t">
+        <a href="{% url 'core:service_list' %}" class="text-indigo-600 hover:text-indigo-800">← Back to Services</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white shadow rounded-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Services</h1>
+        <a href="{% url 'core:service_create' %}" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Add Service</a>
+    </div>
+    
+    <!-- Filters -->
+    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Category</label>
+                <select name="category" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                        <option value="{{ category }}" {% if request.GET.category == category %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Skill Type</label>
+                <select name="skill_type" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
+                    <option value="">All Skill Types</option>
+                    {% for skill_type in skill_types %}
+                        <option value="{{ skill_type }}" {% if request.GET.skill_type == skill_type %}selected{% endif %}>{{ skill_type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Filter</button>
+                <a href="{% url 'core:service_list' %}" class="ml-2 text-gray-600 hover:text-gray-800">Clear</a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Services List -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for service in services %}
+        <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ service.name }}</h3>
+            <p class="text-gray-600 text-sm mb-3">{{ service.description|truncatewords:20 }}</p>
+            <div class="flex flex-wrap gap-2 mb-3">
+                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">{{ service.category }}</span>
+                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">{{ service.skill_type }}</span>
+            </div>
+            <p class="text-sm text-gray-500 mb-3">Facility: {{ service.FacilityId.name }}</p>
+            <div class="flex space-x-2">
+                <a href="{% url 'core:service_detail' service.ServiceId %}" class="text-indigo-600 hover:text-indigo-800 text-sm">View</a>
+                <a href="{% url 'core:service_update' service.ServiceId %}" class="text-green-600 hover:text-green-800 text-sm">Edit</a>
+                <a href="{% url 'core:service_delete' service.ServiceId %}" class="text-red-600 hover:text-red-800 text-sm">Delete</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-8 text-gray-500">
+            <p>No services found.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
