@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+  <!-- Compact Header -->
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-bold text-gray-900">
+      {% if form.instance.pk %}Edit Service{% else %}Create Service{% endif %}
+    </h1>
+    <a href="{% url 'core:service_list' %}" class="text-gray-600 hover:text-gray-800">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+
+  <!-- Compact Form -->
+  <div class="bg-white rounded-lg shadow-sm p-4">
+    <form method="post" class="space-y-3">
+      {% csrf_token %}
+      
+      {% if form.non_field_errors %}
+        <div class="bg-red-50 border border-red-200 rounded p-2">
+          <span class="text-red-700 text-sm">Please correct the errors below:</span>
+        </div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <!-- Service Name -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.name.id_for_label }}">Service Name *</label>
+          {{ form.name }}
+          {% if form.name.errors %}
+            <div class="errorlist">{{ form.name.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Facility -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.FacilityId.id_for_label }}">Facility *</label>
+          {{ form.FacilityId }}
+          {% if form.FacilityId.errors %}
+            <div class="errorlist">{{ form.FacilityId.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.category.id_for_label }}">Category *</label>
+          {{ form.category }}
+          {% if form.category.errors %}
+            <div class="errorlist">{{ form.category.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Skill Type -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.skill_type.id_for_label }}">Skill Type</label>
+          {{ form.skill_type }}
+          {% if form.skill_type.errors %}
+            <div class="errorlist">{{ form.skill_type.errors }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Full width field -->
+      <div class="form-group">
+        <label class="form-label" for="{{ form.description.id_for_label }}">Description</label>
+        {{ form.description }}
+        {% if form.description.errors %}
+          <div class="errorlist">{{ form.description.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Compact Action Buttons -->
+      <div class="flex gap-2 pt-2">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 text-sm rounded hover:bg-blue-700">
+          <i class="bi bi-check"></i> {% if form.instance.pk %}Update{% else %}Create{% endif %}
+        </button>
+        <a href="{% url 'core:service_list' %}" class="bg-gray-500 text-white px-4 py-2 text-sm rounded hover:bg-gray-600">
+          <i class="bi bi-x"></i> Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

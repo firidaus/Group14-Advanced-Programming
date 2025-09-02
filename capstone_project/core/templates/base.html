@@ -1,174 +1,50 @@
 {% load static %}
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Capstone Project{% endblock %}</title>
-    
-    <!-- Tailwind (built file if available) -->
-    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
-    <!-- Fallback for quick prototyping: Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    
-    <style>
-      /* Custom button and form styles */
-      .btn-primary {
-        background-color: #2563eb;
-        color: white;
-        font-weight: 500;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        transition: background-color 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-      }
-      .btn-primary:hover {
-        background-color: #1d4ed8;
-      }
-      
-      .btn-secondary {
-        background-color: #4b5563;
-        color: white;
-        font-weight: 500;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        transition: background-color 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-      }
-      .btn-secondary:hover {
-        background-color: #374151;
-      }
-      
-      .btn-success {
-        background-color: #059669;
-        color: white;
-        font-weight: 500;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        transition: background-color 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-      }
-      .btn-success:hover {
-        background-color: #047857;
-      }
-      
-      .btn-danger {
-        background-color: #dc2626;
-        color: white;
-        font-weight: 500;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        transition: background-color 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-      }
-      .btn-danger:hover {
-        background-color: #b91c1c;
-      }
-      
-      .btn-outline {
-        border: 2px solid #d1d5db;
-        color: #374151;
-        background: white;
-        font-weight: 500;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        text-decoration: none;
-        cursor: pointer;
-      }
-      .btn-outline:hover {
-        border-color: #9ca3af;
-        color: #111827;
-      }
-    </style>
-  </head>
-  <body class="bg-gray-50">
-    <nav class="bg-white border-b shadow-sm">
-      <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-        <a class="text-2xl font-bold text-blue-600" href="/">
-          <i class="bi bi-building"></i> CapstoneHub
-        </a>
-        <div class="hidden md:flex space-x-6">
-          <a class="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center gap-2" href="/">
-            <i class="bi bi-house"></i> Home
-          </a>
-          <a class="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center gap-2" href="{% url 'core:program_list' %}">
-            <i class="bi bi-list-task"></i> Programs
-          </a>
-          <a class="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center gap-2" href="{% url 'core:facility_list' %}">
-            <i class="bi bi-geo-alt"></i> Facilities
-          </a>
-          <a class="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center gap-2" href="{% url 'core:project_list' %}">
-            <i class="bi bi-folder"></i> Projects
-          </a>
-          <a class="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center gap-2" href="{% url 'core:service_list' %}">
-            <i class="bi bi-tools"></i> Services
-          </a>
-          
-          <a class="text-gray-700 hover:text-blue-600 font-medium transition-colors flex items-center gap-2" href="/admin/">
-            <i class="bi bi-gear"></i> Admin
-          </a>
-        </div>
-        <!-- Mobile menu button -->
-        <button class="md:hidden text-gray-700" onclick="toggleMobileMenu()">
-          <i class="bi bi-list text-2xl"></i>
-        </button>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Capstone Project</title>
+
+  <!-- Tailwind (built file if available) -->
+  <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+  <!-- Fallback for quick prototyping: Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+</head>
+
+<body>
+  <nav class="bg-white border-b shadow-sm">
+    <div class="container mx-auto px-4 py-5 flex justify-between items-center">
+      <a class="text-xl font-semibold" href="/">CapstoneHub</a>
+      <div class="space-x-2">
+        <a class="text-gray-700 hover:text-gray-900" href="/">Home</a>
+        <a class="text-gray-700 hover:text-gray-900" href="{% url 'core:program_list' %}">Programs</a>
+        <a class="text-gray-700 hover:text-gray-900" href="{% url 'core:facility_list' %}">Facilities</a>
+        <a class="text-gray-700 hover:text-gray-900" href="{% url 'core:project_list' %}">Projects</a>
+        <a class="text-gray-700 hover:text-gray-900" href="{% url 'core:equipment_list' %}">Equipments</a>
+        <a class="text-gray-700 hover:text-gray-900" href="{% url 'core:service_list' %}">Services</a>
+        <a class="text-gray-700 hover:text-gray-900" href="/admin/">Admin</a>
+        <a class="text-gray-700 hover:text-gray-900" href="{% url 'core:service_list' %}">Services</a>
       </div>
-      <!-- Mobile menu -->
-      <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
-        <div class="px-4 py-2 space-y-2">
-          <a class="block text-gray-700 hover:text-blue-600 font-medium py-2" href="/"><i class="bi bi-house"></i> Home</a>
-          <a class="block text-gray-700 hover:text-blue-600 font-medium py-2" href="{% url 'core:program_list' %}"><i class="bi bi-list-task"></i> Programs</a>
-          <a class="block text-gray-700 hover:text-blue-600 font-medium py-2" href="{% url 'core:facility_list' %}"><i class="bi bi-geo-alt"></i> Facilities</a>
-          <a class="block text-gray-700 hover:text-blue-600 font-medium py-2" href="{% url 'core:project_list' %}"><i class="bi bi-folder"></i> Projects</a>
-          <a class="block text-gray-700 hover:text-blue-600 font-medium py-2" href="{% url 'core:service_list' %}"><i class="bi bi-tools"></i> Services</a>
-          <a class="block text-gray-700 hover:text-blue-600 font-medium py-2" href="/admin/"><i class="bi bi-gear"></i> Admin</a>
-        </div>
-      </div>
-    </nav>
+    </div>
+  </nav>
 
-    <main class="container mx-auto px-4 py-6">
-      {% if messages %}
-        <div class="mb-4">
-          {% for message in messages %}
-            <div class="bg-blue-100 border border-blue-200 text-blue-800 p-3 rounded mb-2">{{ message }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
+  <main class="container mx-auto px-4 py-6">
+    {% if messages %}
+    <div class="mb-4">
+      {% for message in messages %}
+      <div class="bg-blue-100 border border-blue-200 text-blue-800 p-3 rounded mb-2">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
 
-      {% block content %}{% endblock %}
-    </main>
+    {% block content %}{% endblock %}
+  </main>
 
-    <script>
-      function toggleMobileMenu() {
-        const menu = document.getElementById('mobile-menu');
-        menu.classList.toggle('hidden');
-      }
-    </script>
-  </body>
+</body>
+
 </html>

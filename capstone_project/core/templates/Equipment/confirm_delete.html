@@ -1,0 +1,10 @@
+{% extends 'base.html' %} <!-- Remove if no base.html -->
+{% block content %}
+<h1>Delete {{ equipment.name }}?</h1>
+<p>Are you sure? This cannot be undone.</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, Delete</button>
+</form>
+<a href="{% url 'core:equipment_list' %}">Cancel</a>
+{% endblock %}

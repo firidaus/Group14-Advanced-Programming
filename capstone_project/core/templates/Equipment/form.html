@@ -1,0 +1,10 @@
+{% extends 'base.html' %} <!-- Remove if no base.html -->
+{% block content %}
+<h1>{% if object %}Edit{% else %}Create{% endif %} Equipment</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+</form>
+<a href="{% url 'core:equipment_list' %}">Cancel</a>
+{% endblock %}
