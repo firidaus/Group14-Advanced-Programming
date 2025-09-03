@@ -1,70 +1,140 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="flex items-center justify-between mb-4">
-  <h1 class="text-2xl font-bold">Facilities</h1>
-  <a href="{% url 'core:facility_create' %}" class="bg-indigo-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-    <i class="bi bi-plus-lg"></i> New Facility
-  </a>
+<div class="max-w-7xl mx-auto">
+  <!-- Compact Header -->
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-bold text-gray-900">Facilities</h1>
+    <a href="{% url 'core:facility_create' %}" class="bg-blue-600 text-white px-4 py-2 text-sm rounded hover:bg-blue-700">
+      <i class="bi bi-plus"></i> Add Facility
+    </a>
+  </div>
+
+  <!-- Compact Filter Form -->
+  <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+    <form id="filter-form" method="get" class="space-y-3">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+        <div class="form-group">
+          <label class="form-label" for="typeFilter">Type</label>
+          <select id="typeFilter" name="type" class="form-control">
+            <option value="">All Types</option>
+            {% for t in facility_types %}
+              <option value="{{ t }}" {% if request.GET.type == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="partnerFilter">Partner</label>
+          <select id="partnerFilter" name="partner" class="form-control">
+            <option value="">All Partners</option>
+            {% for p in partners %}
+              <option value="{{ p }}" {% if request.GET.partner == p %}selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="capabilityFilter">Capability</label>
+          <input type="text" id="capabilityFilter" name="capability" placeholder="Search capabilities..." value="{{ request.GET.capability }}" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <div class="flex gap-2">
+            <button type="submit" class="bg-green-600 text-white px-4 py-2 text-sm rounded hover:bg-green-700 flex-1">
+              <i class="bi bi-search"></i> Search
+            </button>
+            <button type="button" id="clearFilters" class="bg-gray-500 text-white px-3 py-2 text-sm rounded hover:bg-gray-600">
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-sm text-gray-600">
+        Total: <span id="facilityCount">{{ facilities.count }}</span> facilities
+      </div>
+    </form>
+  </div>
+
+  <!-- Compact Table -->
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Partner</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capabilities</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+          <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="facilityTableBody" class="bg-white divide-y divide-gray-200">
+        {% include 'Facility/facility_table_rows.html' %}
+      </tbody>
+    </table>
+  </div>
 </div>
 
-<!-- Filter Form -->
-<form method="get" class="flex space-x-4 mb-4">
-  <select name="type" class="border rounded p-2">
-    <option value="">All Types</option>
-    {% for t in facility_types %}
-      <option value="{{ t }}" {% if request.GET.type == t %}selected{% endif %}>{{ t }}</option>
-    {% endfor %}
-  </select>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const typeFilter = document.getElementById('typeFilter');
+    const partnerFilter = document.getElementById('partnerFilter');
+    const capabilityFilter = document.getElementById('capabilityFilter');
+    const tableBody = document.getElementById('facilityTableBody');
+    const facilityCount = document.getElementById('facilityCount');
+    const clearButton = document.getElementById('clearFilters');
+    const filterForm = document.getElementById('filter-form');
+    
+    let filterTimeout;
 
-  <select name="partner" class="border rounded p-2">
-    <option value="">All Partners</option>
-    {% for p in partners %}
-      <option value="{{ p }}" {% if request.GET.partner == p %}selected{% endif %}>{{ p }}</option>
-    {% endfor %}
-  </select>
+    function performFilter() {
+        // Clear previous timeout
+        clearTimeout(filterTimeout);
+        
+        // Set a small delay for capability filter to avoid too many requests
+        filterTimeout = setTimeout(() => {
+            const formData = new URLSearchParams();
+            
+            if (typeFilter.value) formData.append('type', typeFilter.value);
+            if (partnerFilter.value) formData.append('partner', partnerFilter.value);
+            if (capabilityFilter.value) formData.append('capability', capabilityFilter.value);
+            
+            // Show loading state
+            tableBody.innerHTML = '<tr><td colspan="7" class="px-4 py-2 text-center text-gray-500">Loading...</td></tr>';
+            
+            fetch('{% url "core:facility_filter_ajax" %}?' + formData.toString())
+                .then(response => response.json())
+                .then(data => {
+                    tableBody.innerHTML = data.table_html;
+                    facilityCount.textContent = data.count;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    tableBody.innerHTML = '<tr><td colspan="7" class="px-4 py-2 text-center text-red-500">Error loading facilities</td></tr>';
+                });
+        }, capabilityFilter === document.activeElement ? 300 : 0); // 300ms delay for text input, immediate for selects
+    }
 
-  <input type="text" name="capability" placeholder="Capability" value="{{ request.GET.capability }}"
-         class="border rounded p-2" />
+    function clearFilters() {
+        typeFilter.value = '';
+        partnerFilter.value = '';
+        capabilityFilter.value = '';
+        performFilter();
+    }
 
-  <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-    Filter
-  </button>
-</form>
-
-<!-- Facility Table -->
-
-<table class="min-w-full border divide-y divide-gray-200">
-  <thead class="bg-gray-50">
-    <tr>
-      <th class="px-4 py-2 text-left">Name</th>
-      <th class="px-4 py-2 text-left">Type</th>
-      <th class="px-4 py-2 text-left">Partner</th>
-      <th class="px-4 py-2 text-left">Location</th>
-      <th class="px-4 py-2 text-left">Capabilities</th>
-       <th class="px-4 py-2 text-left">Description</th>
-      <th class="px-4 py-2 text-center">Actions</th>
-    </tr>
-  </thead>
-  <tbody class="bg-white divide-y divide-gray-200">
-    {% for facility in facilities %}
-    <tr>
-      <td class="px-4 py-2">{{ facility.name }}</td>
-      <td class="px-4 py-2">{{ facility.facility_type }}</td>
-      <td class="px-4 py-2">{{ facility.partner }}</td>
-      <td class="px-4 py-2">{{ facility.location }}</td>
-      <td class="px-4 py-2">{{ facility.capabilities }}</td>
-      <td class="px-4 py-2">{{ facility.description }}</td>
-      <td class="px-4 py-2 text-center space-x-2">
-        <a href="{% url 'core:facility_detail' facility.pk %}" class="text-blue-600 hover:text-blue-800"><i class="bi bi-eye"></i></a>
-        <a href="{% url 'core:facility_update' facility.pk %}" class="text-blue-600 hover:text-blue-800"><i class="bi bi-pencil"></i></a>
-        <a href="{% url 'core:facility_delete' facility.pk %}" class="text-red-600 hover:text-red-800"><i class="bi bi-trash"></i></a>
-      </td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="6" class="px-4 py-2 text-gray-500 text-center">No facilities found.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+    // Add event listeners
+    typeFilter.addEventListener('change', performFilter);
+    partnerFilter.addEventListener('change', performFilter);
+    capabilityFilter.addEventListener('input', performFilter);
+    clearButton.addEventListener('click', clearFilters);
+    
+    // Handle form submission (search button)
+    filterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        performFilter();
+    });
+});
+</script>
 {% endblock %}

@@ -19,6 +19,7 @@ urlpatterns = [
 
     # Facilities
     path('facilities/', fa.facility_list, name='facility_list'),
+    path('facilities/filter/', fa.facility_filter_ajax, name='facility_filter_ajax'),
     path('facilities/create/', fa.facility_create, name='facility_create'),
     path('facilities/<int:pk>/', fa.facility_detail, name='facility_detail'),
     path('facilities/<int:pk>/edit/', fa.facility_update, name='facility_update'),

@@ -2,6 +2,8 @@
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 from core.models import Facility
 from core.forms.Facility_form import FacilityForm  
 
@@ -26,6 +28,30 @@ def facility_list(request):
     } # exact match like facility_type
 
     return render(request, "Facility/facilityview.html", context)
+    
+
+# AJAX endpoint for filtering facilities
+def facility_filter_ajax(request):
+    facilities = Facility.objects.all()
+
+    f_type = request.GET.get("type")
+    f_partner = request.GET.get("partner")
+    f_cap = request.GET.get("capability")
+
+    if f_type:
+        facilities = facilities.filter(facility_type=f_type)
+    if f_partner:
+        facilities = facilities.filter(partner=f_partner)
+    if f_cap:
+        facilities = facilities.filter(capabilities__icontains=f_cap)  # Using icontains for partial matches
+
+    # Render the table rows only
+    table_html = render_to_string('Facility/facility_table_rows.html', {'facilities': facilities})
+    
+    return JsonResponse({
+        'table_html': table_html,
+        'count': facilities.count()
+    })
     
 
 # Detail
