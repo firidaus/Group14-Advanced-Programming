@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-3xl mx-auto p-6 bg-white rounded shadow">
+  <h1 class="text-2xl font-bold mb-4">{{ outcome.title }}</h1>
+  <p class="mb-2"><strong>Project:</strong> {{ outcome.project.title }}</p>
+  <p class="mb-2"><strong>Description:</strong> {{ outcome.description }}</p>
+  <p class="mb-2"><strong>Artifact:</strong> 
+    <a href="{{ outcome.artifact_link }}" class="text-blue-600 hover:underline" target="_blank">
+      {{ outcome.artifact_link }}
+    </a>
+  </p>
+  <p class="mb-2"><strong>Outcome Type:</strong> {{ outcome.outcome_type }}</p>
+  <p class="mb-2"><strong>Quality Certification:</strong> {{ outcome.quality_certification }}</p>
+  <p class="mb-2"><strong>Commercialization Status:</strong> {{ outcome.commercialization_status }}</p>
+
+  <div class="mt-4 space-x-2">
+    <a href="{% url 'core:outcome_update' outcome.pk %}" class="px-4 py-2 bg-yellow-500 text-white rounded">Edit</a>
+    <a href="{% url 'core:outcome_delete' outcome.pk %}" class="px-4 py-2 bg-red-600 text-white rounded">Delete</a>
+    <a href="{% url 'core:outcome_list' %}" class="px-4 py-2 bg-gray-600 text-white rounded">Back</a>
+  </div>
+</div>
+{% endblock %}

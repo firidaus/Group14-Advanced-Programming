@@ -5,7 +5,7 @@ from core.controllers import project_controller as pr
 from core.controllers import service_controller as sc
 from core.controllers import Equipment_controller as eq
 from core.controllers import participant_controller as pa
-
+from core.controllers import outcome_controller as oc
 app_name = 'core'
 
 urlpatterns = [
@@ -55,9 +55,16 @@ urlpatterns = [
     path('participants/<int:pk>/delete/', pa.participant_delete, name='participant_delete'),
 
 
+
+
     path('projects/<int:project_id>/participants/<int:participant_id>/assign/',
          pa.assign_participant, name='assign_participant'),
     path('projects/<int:project_id>/participants/<int:participant_id>/remove/',
          pa.remove_participant, name='remove_participant'),
+    path("outcomes/", oc.outcome_list, name="outcome_list"),
+    path("outcomes/create/", oc.outcome_create, name="outcome_create"),
+    path("outcomes/<int:pk>/", oc.outcome_detail, name="outcome_detail"),
+    path("outcomes/<int:pk>/edit/", oc.outcome_update, name="outcome_update"),
+    path("outcomes/<int:pk>/delete/", oc.outcome_delete, name="outcome_delete"),
 ]
 

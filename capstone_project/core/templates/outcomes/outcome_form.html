@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto p-6 bg-white rounded shadow">
+  <h1 class="text-xl font-bold mb-4">
+    {% if form.instance.pk %} Edit Outcome {% else %} Create Outcome {% endif %}
+  </h1>
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="flex space-x-2">
+      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+      <a href="{% url 'core:outcome_list' %}" class="px-4 py-2 bg-gray-600 text-white rounded">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
