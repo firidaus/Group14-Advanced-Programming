@@ -1,11 +1,35 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
 from core.models.program import Program
+from core.models.Faciltymodels import Facility
+from core.models.project import Project
+from core.models.participant import Participant
+from core.models.Equipment import Equipment
+from core.models.service import Service
+from core.models.Outcome import Outcome
 from core.forms.program_form import ProgramForm
 
 
 def program_list(request):
-    programs = Program.objects.all()
-    return render(request, 'program/list.html', {'programs': programs})
+    # For the home page, gather dashboard data
+    context = {
+        'programs': Program.objects.all(),
+        'programs_count': Program.objects.count(),
+        'facilities_count': Facility.objects.count(),
+        'projects_count': Project.objects.count(),
+        'participants_count': Participant.objects.count(),
+        'equipment_count': Equipment.objects.count(),
+        'services_count': Service.objects.count(),
+        'outcomes_count': Outcome.objects.count(),
+        'today': timezone.now().date(),
+        'now': timezone.now(),
+    }
+    
+    # If accessing the root URL, show dashboard; otherwise show program list
+    if request.resolver_match.url_name == 'home':
+        return render(request, 'home.html', context)
+    else:
+        return render(request, 'program/list.html', context)
 
 
 def program_detail(request, pk):

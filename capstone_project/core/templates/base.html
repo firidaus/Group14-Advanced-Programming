@@ -5,47 +5,294 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Capstone Project</title>
+  <title>{% block title %}Capstone Project{% endblock %}</title>
 
-  <!-- Tailwind (built file if available) -->
-  <link href="{% static 'css/styles.css' %}" rel="stylesheet">
-  <!-- Fallback for quick prototyping: Tailwind CDN -->
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  
+  <!-- Custom Responsive CSS -->
+  <link href="{% static 'css/responsive.css' %}" rel="stylesheet">
+  
+  <!-- Custom Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'navy': '#1e3a8a',
+            'navy-dark': '#1e40af',
+            'navy-light': '#3b82f6'
+          }
+        }
+      }
+    }
+  </script>
 
+  <style>
+    /* Custom scrollbar for sidebar */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 2px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    
+    /* Mobile-optimized sidebar */
+    @media (max-width: 1023px) {
+      .sidebar-mobile {
+        width: 280px;
+      }
+    }
+    
+    /* Enhanced mobile touch targets */
+    @media (max-width: 768px) {
+      .touch-target {
+        min-height: 48px;
+        padding: 12px 16px;
+      }
+      
+      .mobile-padding {
+        padding: 16px;
+      }
+      
+      .mobile-text {
+        font-size: 16px;
+      }
+    }
+    
+    /* Responsive text scaling */
+    @media (max-width: 640px) {
+      .responsive-title {
+        font-size: 1.5rem;
+      }
+      
+      .responsive-subtitle {
+        font-size: 0.875rem;
+      }
+    }
+    
+    /* Smooth transitions for better UX */
+    .smooth-transition {
+      transition: all 0.3s ease-in-out;
+    }
+  </style>
 </head>
 
-<body>
-  <nav class="bg-white border-b shadow-sm">
-    <div class="container mx-auto px-4 py-5 flex justify-between items-center">
-      <a class="text-xl font-semibold" href="/">CapstoneHub</a>
-      <div class="space-x-2">
-        <a class="text-gray-700 hover:text-gray-900" href="/">Home</a>
-        <a class="text-gray-700 hover:text-gray-900" href="{% url 'core:program_list' %}">Programs</a>
-        <a class="text-gray-700 hover:text-gray-900" href="{% url 'core:facility_list' %}">Facilities</a>
-        <a class="text-gray-700 hover:text-gray-900" href="{% url 'core:project_list' %}">Projects</a>
-        <a class="text-gray-700 hover:text-gray-900" href="{% url 'core:equipment_list' %}">Equipments</a>
-        <a class="text-gray-700 hover:text-gray-900" href="{% url 'core:service_list' %}">Services</a>
-        <a class="text-gray-700 hover:text-gray-900" href="{% url 'core:participant_list' %}">Participants</a>
-        <a class="text-gray-700 hover:text-gray-900" href="{% url 'core:outcome_list' %}">Outcomes</a>
-        
+<body class="bg-gray-50">
+  <!-- Top Navigation Bar -->
+  <nav class="bg-navy text-white shadow-lg fixed w-full top-0 z-50">
+    <div class="px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+      <!-- Left side: Menu toggle and brand -->
+      <div class="flex items-center space-x-3 lg:space-x-4">
+        <button id="sidebarToggle" class="lg:hidden text-white hover:text-gray-200 focus:outline-none touch-target p-2 -ml-2">
+          <i class="bi bi-list text-xl"></i>
+        </button>
+        <a href="/" class="text-lg sm:text-xl font-bold text-white hover:text-gray-200 smooth-transition">
+          <i class="bi bi-mortarboard-fill mr-1 sm:mr-2"></i>
+          <span class="hidden sm:inline">CapstoneHub</span>
+          <span class="sm:hidden">CH</span>
+        </a>
+      </div>
+      
+      <!-- Right side: User actions -->
+      <div class="flex items-center space-x-2 sm:space-x-4">
+        <div class="hidden md:flex items-center space-x-2 text-sm">
+          <i class="bi bi-person-circle text-lg"></i>
+          <span class="hidden lg:inline">Admin User</span>
+        </div>
+        <button class="text-white hover:text-gray-200 focus:outline-none touch-target p-2">
+          <i class="bi bi-gear text-lg"></i>
+        </button>
       </div>
     </div>
   </nav>
 
-  <main class="container mx-auto px-4 py-6">
-    {% if messages %}
-    <div class="mb-4">
-      {% for message in messages %}
-      <div class="bg-blue-100 border border-blue-200 text-blue-800 p-3 rounded mb-2">{{ message }}</div>
-      {% endfor %}
-    </div>
-    {% endif %}
+  <!-- Sidebar -->
+  <aside id="sidebar" class="fixed left-0 top-0 pt-16 bg-white border-r border-gray-200 h-full sidebar-mobile lg:w-64 transform -translate-x-full lg:translate-x-0 smooth-transition z-40 custom-scrollbar overflow-y-auto">
+    <div class="p-4 lg:p-6">
+      <!-- Sidebar Header -->
+      <div class="mb-6">
+        <h2 class="text-base lg:text-lg font-semibold text-gray-800 mb-1">Navigation</h2>
+        <p class="text-xs lg:text-sm text-gray-500">Manage your capstone ecosystem</p>
+      </div>
 
-    {% block content %}{% endblock %}
+      <!-- Navigation Menu -->
+      <nav class="space-y-1 lg:space-y-2">
+        <!-- Dashboard -->
+        <a href="/" class="flex items-center space-x-3 px-3 py-3 lg:py-2.5 rounded-lg {% if request.path == '/' %}bg-navy text-white{% else %}text-gray-700 hover:bg-navy hover:text-white{% endif %} smooth-transition group touch-target">
+          <i class="bi bi-house-door-fill text-lg {% if request.path == '/' %}text-white{% else %}group-hover:text-white{% endif %} flex-shrink-0"></i>
+          <span class="font-medium mobile-text">Dashboard</span>
+        </a>
+
+        <!-- Programs -->
+        <a href="{% url 'core:program_list' %}" class="flex items-center space-x-3 px-3 py-3 lg:py-2.5 rounded-lg {% if 'program' in request.path %}bg-navy text-white{% else %}text-gray-700 hover:bg-navy hover:text-white{% endif %} smooth-transition group touch-target">
+          <i class="bi bi-diagram-3-fill text-lg {% if 'program' in request.path %}text-white{% else %}group-hover:text-white{% endif %} flex-shrink-0"></i>
+          <span class="font-medium mobile-text">Programs</span>
+        </a>
+
+        <!-- Facilities -->
+        <a href="{% url 'core:facility_list' %}" class="flex items-center space-x-3 px-3 py-3 lg:py-2.5 rounded-lg {% if 'facilit' in request.path %}bg-navy text-white{% else %}text-gray-700 hover:bg-navy hover:text-white{% endif %} smooth-transition group touch-target">
+          <i class="bi bi-building-fill text-lg {% if 'facilit' in request.path %}text-white{% else %}group-hover:text-white{% endif %} flex-shrink-0"></i>
+          <span class="font-medium mobile-text">Facilities</span>
+        </a>
+
+        <!-- Projects -->
+        <a href="{% url 'core:project_list' %}" class="flex items-center space-x-3 px-3 py-3 lg:py-2.5 rounded-lg {% if 'project' in request.path %}bg-navy text-white{% else %}text-gray-700 hover:bg-navy hover:text-white{% endif %} smooth-transition group touch-target">
+          <i class="bi bi-folder-fill text-lg {% if 'project' in request.path %}text-white{% else %}group-hover:text-white{% endif %} flex-shrink-0"></i>
+          <span class="font-medium mobile-text">Projects</span>
+        </a>
+
+        <!-- Equipment -->
+        <a href="{% url 'core:equipment_list' %}" class="flex items-center space-x-3 px-3 py-3 lg:py-2.5 rounded-lg {% if 'equipment' in request.path %}bg-navy text-white{% else %}text-gray-700 hover:bg-navy hover:text-white{% endif %} smooth-transition group touch-target">
+          <i class="bi bi-tools text-lg {% if 'equipment' in request.path %}text-white{% else %}group-hover:text-white{% endif %} flex-shrink-0"></i>
+          <span class="font-medium mobile-text">Equipment</span>
+        </a>
+
+        <!-- Services -->
+        <a href="{% url 'core:service_list' %}" class="flex items-center space-x-3 px-3 py-3 lg:py-2.5 rounded-lg {% if 'service' in request.path %}bg-navy text-white{% else %}text-gray-700 hover:bg-navy hover:text-white{% endif %} smooth-transition group touch-target">
+          <i class="bi bi-gear-wide-connected text-lg {% if 'service' in request.path %}text-white{% else %}group-hover:text-white{% endif %} flex-shrink-0"></i>
+          <span class="font-medium mobile-text">Services</span>
+        </a>
+
+        <!-- Participants -->
+        <a href="{% url 'core:participant_list' %}" class="flex items-center space-x-3 px-3 py-3 lg:py-2.5 rounded-lg {% if 'participant' in request.path %}bg-navy text-white{% else %}text-gray-700 hover:bg-navy hover:text-white{% endif %} smooth-transition group touch-target">
+          <i class="bi bi-people-fill text-lg {% if 'participant' in request.path %}text-white{% else %}group-hover:text-white{% endif %} flex-shrink-0"></i>
+          <span class="font-medium mobile-text">Participants</span>
+        </a>
+
+        <!-- Outcomes -->
+        <a href="{% url 'core:outcome_list' %}" class="flex items-center space-x-3 px-3 py-3 lg:py-2.5 rounded-lg {% if 'outcome' in request.path %}bg-navy text-white{% else %}text-gray-700 hover:bg-navy hover:text-white{% endif %} smooth-transition group touch-target">
+          <i class="bi bi-trophy-fill text-lg {% if 'outcome' in request.path %}text-white{% else %}group-hover:text-white{% endif %} flex-shrink-0"></i>
+          <span class="font-medium mobile-text">Outcomes</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar Footer -->
+      <div class="mt-6 lg:mt-8 pt-4 lg:pt-6 border-t border-gray-200">
+        <div class="text-xs text-gray-500 text-center">
+          <p>© 2025 CapstoneHub</p>
+          <p class="hidden lg:block">Advanced Programming Project</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Sidebar Overlay for mobile -->
+  <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
+
+  <!-- Main Content Area -->
+  <main class="lg:ml-64 pt-16 min-h-screen">
+    <div class="p-4 sm:p-6">
+      <!-- Messages -->
+      {% if messages %}
+      <div class="mb-4 sm:mb-6">
+        {% for message in messages %}
+        <div class="bg-green-50 border border-green-200 text-green-800 p-3 sm:p-4 rounded-lg mb-3 flex items-center">
+          <i class="bi bi-check-circle-fill mr-2 flex-shrink-0"></i>
+          <span class="mobile-text">{{ message }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Page Content -->
+      {% block content %}{% endblock %}
+    </div>
   </main>
 
+  <!-- JavaScript for sidebar toggle -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const mainContent = document.querySelector('main');
+
+      function toggleSidebar() {
+        sidebar.classList.toggle('-translate-x-full');
+        sidebarOverlay.classList.toggle('hidden');
+        document.body.classList.toggle('overflow-hidden');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.add('-translate-x-full');
+        sidebarOverlay.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+
+      // Toggle sidebar
+      sidebarToggle.addEventListener('click', toggleSidebar);
+      
+      // Close sidebar when clicking overlay
+      sidebarOverlay.addEventListener('click', closeSidebar);
+
+      // Close sidebar on escape key
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && !sidebar.classList.contains('-translate-x-full')) {
+          closeSidebar();
+        }
+      });
+
+      // Close sidebar when clicking links on mobile
+      if (window.innerWidth < 1024) {
+        const sidebarLinks = sidebar.querySelectorAll('a');
+        sidebarLinks.forEach(link => {
+          link.addEventListener('click', function() {
+            // Small delay to allow navigation to start
+            setTimeout(closeSidebar, 100);
+          });
+        });
+      }
+
+      // Handle window resize
+      window.addEventListener('resize', function() {
+        if (window.innerWidth >= 1024) {
+          closeSidebar();
+        }
+      });
+
+      // Touch gesture support for mobile
+      let touchStartX = 0;
+      let touchCurrentX = 0;
+      let touchStarted = false;
+
+      mainContent.addEventListener('touchstart', function(e) {
+        touchStartX = e.touches[0].clientX;
+        touchStarted = true;
+      }, { passive: true });
+
+      mainContent.addEventListener('touchmove', function(e) {
+        if (!touchStarted) return;
+        touchCurrentX = e.touches[0].clientX;
+      }, { passive: true });
+
+      mainContent.addEventListener('touchend', function(e) {
+        if (!touchStarted) return;
+        touchStarted = false;
+        
+        const touchDistance = touchCurrentX - touchStartX;
+        const threshold = 100; // Minimum swipe distance
+        
+        // Swipe right to open sidebar
+        if (touchDistance > threshold && touchStartX < 50 && sidebar.classList.contains('-translate-x-full')) {
+          toggleSidebar();
+        }
+        // Swipe left to close sidebar
+        else if (touchDistance < -threshold && !sidebar.classList.contains('-translate-x-full')) {
+          closeSidebar();
+        }
+      }, { passive: true });
+    });
+  </script>
 </body>
 
 </html>

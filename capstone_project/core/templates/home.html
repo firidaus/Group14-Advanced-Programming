@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Capstone Project{% endblock %}
+
+{% block content %}
+<div class="space-y-4 sm:space-y-6">
+  <!-- Page Header -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2 responsive-title">Dashboard</h1>
+        <p class="text-sm sm:text-base text-gray-600 responsive-subtitle">Welcome to the Capstone Project Management System</p>
+      </div>
+      <div class="text-left sm:text-right">
+        <div class="text-xs sm:text-sm text-gray-500">{{ today|date:"F d, Y" }}</div>
+        <div class="text-base sm:text-lg font-semibold text-navy">{{ user.get_full_name|default:"Admin User" }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+    <!-- Programs -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md smooth-transition">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="bg-navy bg-opacity-10 p-2 sm:p-3 rounded-lg">
+            <i class="bi bi-diagram-3-fill text-navy text-lg sm:text-xl"></i>
+          </div>
+        </div>
+        <div class="ml-3 sm:ml-4 min-w-0 flex-1">
+          <h3 class="text-xl sm:text-2xl font-bold text-gray-900 truncate">{{ programs_count|default:"0" }}</h3>
+          <p class="text-xs sm:text-sm text-gray-600">Programs</p>
+        </div>
+      </div>
+      <div class="mt-3 sm:mt-4">
+        <a href="{% url 'core:program_list' %}" class="text-navy hover:text-navy-dark text-xs sm:text-sm font-medium">
+          View all programs →
+        </a>
+      </div>
+    </div>
+
+    <!-- Facilities -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md smooth-transition">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="bg-green-100 p-2 sm:p-3 rounded-lg">
+            <i class="bi bi-building-fill text-green-600 text-lg sm:text-xl"></i>
+          </div>
+        </div>
+        <div class="ml-3 sm:ml-4 min-w-0 flex-1">
+          <h3 class="text-xl sm:text-2xl font-bold text-gray-900 truncate">{{ facilities_count|default:"0" }}</h3>
+          <p class="text-xs sm:text-sm text-gray-600">Facilities</p>
+        </div>
+      </div>
+      <div class="mt-3 sm:mt-4">
+        <a href="{% url 'core:facility_list' %}" class="text-green-600 hover:text-green-700 text-xs sm:text-sm font-medium">
+          View all facilities →
+        </a>
+      </div>
+    </div>
+
+    <!-- Projects -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md smooth-transition">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="bg-purple-100 p-2 sm:p-3 rounded-lg">
+            <i class="bi bi-folder-fill text-purple-600 text-lg sm:text-xl"></i>
+          </div>
+        </div>
+        <div class="ml-3 sm:ml-4 min-w-0 flex-1">
+          <h3 class="text-xl sm:text-2xl font-bold text-gray-900 truncate">{{ projects_count|default:"0" }}</h3>
+          <p class="text-xs sm:text-sm text-gray-600">Projects</p>
+        </div>
+      </div>
+      <div class="mt-3 sm:mt-4">
+        <a href="{% url 'core:project_list' %}" class="text-purple-600 hover:text-purple-700 text-xs sm:text-sm font-medium">
+          View all projects →
+        </a>
+      </div>
+    </div>
+
+    <!-- Participants -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md smooth-transition">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="bg-blue-100 p-2 sm:p-3 rounded-lg">
+            <i class="bi bi-people-fill text-blue-600 text-lg sm:text-xl"></i>
+          </div>
+        </div>
+        <div class="ml-3 sm:ml-4 min-w-0 flex-1">
+          <h3 class="text-xl sm:text-2xl font-bold text-gray-900 truncate">{{ participants_count|default:"0" }}</h3>
+          <p class="text-xs sm:text-sm text-gray-600">Participants</p>
+        </div>
+      </div>
+      <div class="mt-3 sm:mt-4">
+        <a href="{% url 'core:participant_list' %}" class="text-blue-600 hover:text-blue-700 text-xs sm:text-sm font-medium">
+          View all participants →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+    <!-- Recent Activity -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+      <h2 class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Quick Actions</h2>
+      <div class="space-y-2 sm:space-y-3">
+        <a href="{% url 'core:program_create' %}" class="flex items-center p-3 sm:p-4 rounded-lg border border-gray-200 hover:bg-gray-50 smooth-transition touch-target">
+          <i class="bi bi-plus-circle-fill text-navy mr-3 text-lg flex-shrink-0"></i>
+          <span class="font-medium text-sm sm:text-base">Create New Program</span>
+        </a>
+        <a href="{% url 'core:project_create' %}" class="flex items-center p-3 sm:p-4 rounded-lg border border-gray-200 hover:bg-gray-50 smooth-transition touch-target">
+          <i class="bi bi-plus-circle-fill text-purple-600 mr-3 text-lg flex-shrink-0"></i>
+          <span class="font-medium text-sm sm:text-base">Create New Project</span>
+        </a>
+        <a href="{% url 'core:facility_create' %}" class="flex items-center p-3 sm:p-4 rounded-lg border border-gray-200 hover:bg-gray-50 smooth-transition touch-target">
+          <i class="bi bi-plus-circle-fill text-green-600 mr-3 text-lg flex-shrink-0"></i>
+          <span class="font-medium text-sm sm:text-base">Register New Facility</span>
+        </a>
+        <a href="{% url 'core:participant_create' %}" class="flex items-center p-3 sm:p-4 rounded-lg border border-gray-200 hover:bg-gray-50 smooth-transition touch-target">
+          <i class="bi bi-plus-circle-fill text-blue-600 mr-3 text-lg flex-shrink-0"></i>
+          <span class="font-medium text-sm sm:text-base">Add New Participant</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- System Overview -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+      <h2 class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">System Overview</h2>
+      <div class="space-y-3 sm:space-y-4">
+        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div class="flex items-center min-w-0 flex-1">
+            <i class="bi bi-tools text-gray-600 mr-3 flex-shrink-0"></i>
+            <span class="text-sm text-gray-700 truncate">Equipment</span>
+          </div>
+          <span class="text-sm font-semibold text-gray-900 ml-2">{{ equipment_count|default:"0" }}</span>
+        </div>
+        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div class="flex items-center min-w-0 flex-1">
+            <i class="bi bi-gear-wide-connected text-gray-600 mr-3 flex-shrink-0"></i>
+            <span class="text-sm text-gray-700 truncate">Services</span>
+          </div>
+          <span class="text-sm font-semibold text-gray-900 ml-2">{{ services_count|default:"0" }}</span>
+        </div>
+        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div class="flex items-center min-w-0 flex-1">
+            <i class="bi bi-trophy-fill text-gray-600 mr-3 flex-shrink-0"></i>
+            <span class="text-sm text-gray-700 truncate">Outcomes</span>
+          </div>
+          <span class="text-sm font-semibold text-gray-900 ml-2">{{ outcomes_count|default:"0" }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Status -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+    <h2 class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">System Status</h2>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+      <div class="flex items-center">
+        <div class="w-3 h-3 bg-green-500 rounded-full mr-3 flex-shrink-0"></div>
+        <span class="text-sm text-gray-700">All systems operational</span>
+      </div>
+      <div class="text-xs sm:text-sm text-gray-500">Last updated: {{ now|date:"g:i A" }}</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

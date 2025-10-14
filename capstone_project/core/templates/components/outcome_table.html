@@ -1,0 +1,170 @@
+<!-- Responsive Outcome Table Component -->
+<div class="overflow-x-auto">
+  <!-- Mobile Cards View (hidden on desktop) -->
+  <div class="block md:hidden space-y-4">
+    {% for outcome in outcomes %}
+      <div class="bg-white rounded-lg shadow border border-gray-200 p-4">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex-1">
+            <h3 class="font-semibold text-gray-900 mb-1">
+              <i class="bi bi-trophy-fill text-navy-700 mr-2"></i>
+              {{ outcome.title }}
+            </h3>
+            <p class="text-sm text-gray-600 mb-2">
+              {{ outcome.description|truncatechars:60 }}
+            </p>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <div>
+            <span class="font-medium text-gray-500">Type:</span>
+            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+              {{ outcome.get_outcome_type_display }}
+            </span>
+          </div>
+          <div>
+            <span class="font-medium text-gray-500">Date:</span>
+            <p class="text-gray-900">{{ outcome.date|date:"M d, Y" }}</p>
+          </div>
+          <div>
+            <span class="font-medium text-gray-500">Impact:</span>
+            {% if outcome.impact_score %}
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                {{ outcome.impact_score }}/10
+              </span>
+            {% else %}
+              <span class="text-gray-400">Not rated</span>
+            {% endif %}
+          </div>
+          <div>
+            <span class="font-medium text-gray-500">Project:</span>
+            <p class="text-gray-900">{{ outcome.project.title|truncatechars:20 }}</p>
+          </div>
+        </div>
+        
+        {% if outcome.metrics %}
+          <div class="mt-3 pt-3 border-t border-gray-200">
+            <span class="font-medium text-gray-500 block mb-1">Metrics:</span>
+            <p class="text-gray-900 text-sm">{{ outcome.metrics|truncatechars:50 }}</p>
+          </div>
+        {% endif %}
+        
+        <div class="flex justify-end space-x-2 mt-4 pt-3 border-t border-gray-200">
+          <a href="{% url 'core:outcome_detail' outcome.pk %}" 
+             class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium text-navy-700 bg-navy-50 hover:bg-navy-100">
+            <i class="bi bi-eye mr-1"></i> View
+          </a>
+          <a href="{% url 'core:outcome_update' outcome.pk %}" 
+             class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100">
+            <i class="bi bi-pencil mr-1"></i> Edit
+          </a>
+          <a href="{% url 'core:outcome_delete' outcome.pk %}" 
+             class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100">
+            <i class="bi bi-trash mr-1"></i> Delete
+          </a>
+        </div>
+      </div>
+    {% empty %}
+      <div class="text-center py-8">
+        <i class="bi bi-trophy text-gray-300 text-4xl mb-4"></i>
+        <p class="text-gray-500">No outcomes found.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Desktop Table View (hidden on mobile) -->
+  <div class="hidden md:block">
+    <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg shadow">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <i class="bi bi-trophy text-navy-700 mr-1"></i> Outcome
+          </th>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <i class="bi bi-tag text-navy-700 mr-1"></i> Type
+          </th>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <i class="bi bi-calendar text-navy-700 mr-1"></i> Date
+          </th>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <i class="bi bi-graph-up text-navy-700 mr-1"></i> Impact
+          </th>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <i class="bi bi-folder text-navy-700 mr-1"></i> Project
+          </th>
+          <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <i class="bi bi-gear-fill text-navy-700 mr-1"></i> Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for outcome in outcomes %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-3 py-3 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-8 w-8">
+                  <div class="h-8 w-8 rounded-full bg-navy-100 flex items-center justify-center">
+                    <i class="bi bi-trophy-fill text-navy-600 text-sm"></i>
+                  </div>
+                </div>
+                <div class="ml-3">
+                  <div class="text-sm font-medium text-gray-900">{{ outcome.title }}</div>
+                  <div class="text-sm text-gray-500">{{ outcome.description|truncatechars:50 }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                {{ outcome.get_outcome_type_display }}
+              </span>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap">
+              <div class="text-sm text-gray-900">
+                <i class="bi bi-calendar3 text-gray-400 mr-1"></i>
+                {{ outcome.date|date:"M d, Y" }}
+              </div>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap">
+              {% if outcome.impact_score %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <i class="bi bi-star-fill mr-1"></i>{{ outcome.impact_score }}/10
+                </span>
+              {% else %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  Not rated
+                </span>
+              {% endif %}
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ outcome.project.title|truncatechars:25 }}</div>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap text-center text-sm font-medium">
+              <div class="flex justify-center space-x-2">
+                <a href="{% url 'core:outcome_detail' outcome.pk %}" 
+                   class="text-navy-600 hover:text-navy-900 p-1 rounded" title="View Details">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="{% url 'core:outcome_update' outcome.pk %}" 
+                   class="text-blue-600 hover:text-blue-900 p-1 rounded" title="Edit">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'core:outcome_delete' outcome.pk %}" 
+                   class="text-red-600 hover:text-red-900 p-1 rounded" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="px-3 py-8 text-center text-gray-500">
+              <i class="bi bi-trophy text-gray-300 text-4xl mb-4"></i>
+              <p>No outcomes found.</p>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

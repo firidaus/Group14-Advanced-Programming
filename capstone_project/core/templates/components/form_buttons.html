@@ -1,0 +1,15 @@
+<!-- Standardized Form Buttons Component -->
+<!-- Usage: {% include 'components/form_buttons.html' with cancel_url_name='namespace:url_name' %} -->
+
+<div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+  <a href="{% url cancel_url_name %}" 
+     class="inline-flex items-center justify-center px-6 py-2.5 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-medium rounded-lg smooth-transition touch-target">
+    <i class="bi bi-x-lg mr-2"></i>
+    Cancel
+  </a>
+  <button type="submit" 
+          class="inline-flex items-center justify-center px-6 py-2.5 bg-navy hover:bg-navy-dark text-white font-medium rounded-lg smooth-transition touch-target">
+    <i class="bi bi-check-lg mr-2"></i>
+    Save
+  </button>
+</div>
