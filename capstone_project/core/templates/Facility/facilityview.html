@@ -1,21 +1,24 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div class="max-w-7xl mx-auto">
-  <!-- Compact Header -->
-  <div class="flex items-center justify-between mb-4">
-    <h1 class="text-xl font-bold text-gray-900">Facilities</h1>
-    <a href="{% url 'core:facility_create' %}" class="bg-blue-600 text-white px-4 py-2 text-sm rounded hover:bg-blue-700">
-      <i class="bi bi-plus"></i> Add Facility
+<div class="space-y-4 sm:space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+    <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Facilities</h1>
+    <a href="{% url 'core:facility_create' %}" 
+       class="inline-flex items-center justify-center px-4 py-2.5 bg-navy hover:bg-navy-dark text-white font-medium rounded-lg smooth-transition touch-target">
+      <i class="bi bi-plus-lg mr-2"></i>
+      <span>New Facility</span>
     </a>
   </div>
 
-  <!-- Compact Filter Form -->
-  <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+  <!-- Filter Form -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
     <form id="filter-form" method="get" class="space-y-3">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
         <div class="form-group">
           <label class="form-label" for="typeFilter">Type</label>
-          <select id="typeFilter" name="type" class="form-control">
+          <select id="typeFilter" name="type" class="border border-gray-300 rounded-md px-3 py-2 focus:ring-navy focus:border-navy">
             <option value="">All Types</option>
             {% for t in facility_types %}
               <option value="{{ t }}" {% if request.GET.type == t %}selected{% endif %}>{{ t }}</option>
@@ -25,7 +28,7 @@
 
         <div class="form-group">
           <label class="form-label" for="partnerFilter">Partner</label>
-          <select id="partnerFilter" name="partner" class="form-control">
+          <select id="partnerFilter" name="partner" class="border border-gray-300 rounded-md px-3 py-2 focus:ring-navy focus:border-navy">
             <option value="">All Partners</option>
             {% for p in partners %}
               <option value="{{ p }}" {% if request.GET.partner == p %}selected{% endif %}>{{ p }}</option>
@@ -35,15 +38,17 @@
 
         <div class="form-group">
           <label class="form-label" for="capabilityFilter">Capability</label>
-          <input type="text" id="capabilityFilter" name="capability" placeholder="Search capabilities..." value="{{ request.GET.capability }}" class="form-control" />
+          <input type="text" id="capabilityFilter" name="capability" placeholder="Search capabilities..." 
+                 value="{{ request.GET.capability }}" 
+                 class="border border-gray-300 rounded-md px-3 py-2 focus:ring-navy focus:border-navy" />
         </div>
 
         <div class="form-group">
           <div class="flex gap-2">
-            <button type="submit" class="bg-green-600 text-white px-4 py-2 text-sm rounded hover:bg-green-700 flex-1">
-              <i class="bi bi-search"></i> Search
+            <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-navy hover:bg-navy-dark text-white font-medium rounded-md smooth-transition flex-1">
+              <i class="bi bi-funnel mr-2"></i> Filter
             </button>
-            <button type="button" id="clearFilters" class="bg-gray-500 text-white px-3 py-2 text-sm rounded hover:bg-gray-600">
+            <button type="button" id="clearFilters" class="inline-flex items-center justify-center px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-md smooth-transition">
               <i class="bi bi-x"></i>
             </button>
           </div>
@@ -56,24 +61,26 @@
     </form>
   </div>
 
-  <!-- Compact Table -->
-  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
-        <tr>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Partner</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capabilities</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-          <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-        </tr>
-      </thead>
-      <tbody id="facilityTableBody" class="bg-white divide-y divide-gray-200">
-        {% include 'Facility/facility_table_rows.html' %}
-      </tbody>
-    </table>
+  <!-- Facilities Table -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+            <th class="hidden md:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+            <th class="hidden md:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Partner</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+            <th class="hidden lg:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capabilities</th>
+            <th class="hidden xl:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+            <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="facilityTableBody" class="bg-white divide-y divide-gray-200">
+          {% include 'Facility/facility_table_rows.html' %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 

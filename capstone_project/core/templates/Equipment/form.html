@@ -1,10 +1,39 @@
-{% extends 'base.html' %} <!-- Remove if no base.html -->
+{% extends 'base.html' %}
 {% block content %}
-<h1>{% if object %}Edit{% else %}Create{% endif %} Equipment</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save</button>
-</form>
-<a href="{% url 'core:equipment_list' %}">Cancel</a>
+<div class="container mx-auto px-4 py-6">
+  <div class="bg-white rounded-lg shadow p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">
+      <i class="bi bi-tools text-navy-700"></i>
+      {% if form.instance.pk %}Edit{% else %}Add New{% endif %} Equipment
+    </h1>
+    
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      
+      {% for field in form %}
+        <div class="form-group">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <div class="errorlist">{{ field.errors }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <!-- Standardized Action Buttons -->
+      <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+        <a href="{% url 'core:equipment_list' %}" 
+           class="inline-flex items-center justify-center px-6 py-2.5 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-medium rounded-lg touch-target">
+          <i class="bi bi-x-lg mr-2"></i>
+          Cancel
+        </a>
+        <button type="submit" 
+                class="inline-flex items-center justify-center px-6 py-2.5 bg-navy hover:bg-navy-dark text-white font-medium rounded-lg touch-target">
+          <i class="bi bi-check-lg mr-2"></i>
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

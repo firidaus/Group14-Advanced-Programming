@@ -1,0 +1,124 @@
+<!-- Equipment Table Template -->
+{% with entity_name_singular="equipment" entity_name_plural="equipment" empty_icon="tools" %}
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+  <!-- Mobile Cards (shown on small screens) -->
+  <div class="block sm:hidden">
+    {% for item in items %}
+    <div class="border-b border-gray-200 last:border-b-0 p-4">
+      <div class="flex items-start justify-between mb-3">
+        <div class="min-w-0 flex-1">
+          <h3 class="text-base font-semibold text-gray-900 truncate">{{ item.name }}</h3>
+          <p class="text-sm text-gray-500 mt-1">{{ item.facility.name }}</p>
+        </div>
+        <div class="ml-3">
+          <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-1 rounded-full">{{ item.usage_domain }}</span>
+        </div>
+      </div>
+      
+      {% if item.description %}
+      <div class="mb-4">
+        <p class="text-sm text-gray-600 line-clamp-2">{{ item.description }}</p>
+      </div>
+      {% endif %}
+      
+      <div class="flex items-center space-x-4">
+        <a href="{% url 'core:equipment_detail' item.pk %}" 
+           class="flex items-center text-sm text-navy hover:text-navy-dark font-medium">
+          <i class="bi bi-eye mr-1.5"></i>
+          View
+        </a>
+        <a href="{% url 'core:equipment_update' item.pk %}" 
+           class="flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium">
+          <i class="bi bi-pencil mr-1.5"></i>
+          Edit
+        </a>
+        <a href="{% url 'core:equipment_delete' item.pk %}" 
+           class="flex items-center text-sm text-red-600 hover:text-red-800 font-medium">
+          <i class="bi bi-trash mr-1.5"></i>
+          Delete
+        </a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="p-8 text-center">
+      <i class="bi bi-{{ empty_icon }} text-4xl text-gray-400 mb-4"></i>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No {{ entity_name_plural }} found</h3>
+      <p class="text-gray-500 mb-4">Get started by adding your first {{ entity_name_singular }}.</p>
+      <a href="{% url 'core:equipment_create' %}" 
+         class="inline-flex items-center px-4 py-2 bg-navy hover:bg-navy-dark text-white font-medium rounded-lg smooth-transition">
+        <i class="bi bi-plus-lg mr-2"></i>
+        Add {{ entity_name_singular|title }}
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Desktop Table (shown on larger screens) -->
+  <div class="hidden sm:block overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+          <th class="hidden md:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usage Domain</th>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Facility</th>
+          <th class="hidden lg:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+          <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for item in items %}
+        <tr class="hover:bg-gray-50 smooth-transition">
+          <td class="px-3 py-3">
+            <div class="flex flex-col">
+              <div class="font-medium text-gray-900">{{ item.name }}</div>
+              <div class="sm:hidden text-sm text-gray-500 mt-1">
+                <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2 py-0.5 rounded">{{ item.usage_domain }}</span>
+              </div>
+            </div>
+          </td>
+          <td class="hidden md:table-cell px-3 py-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+              {{ item.usage_domain }}
+            </span>
+          </td>
+          <td class="px-3 py-3 text-sm text-gray-900">{{ item.facility.name }}</td>
+          <td class="hidden lg:table-cell px-3 py-3 text-sm text-gray-500 max-w-xs truncate">{{ item.description|default:"—" }}</td>
+          <td class="px-3 py-3">
+            <div class="flex items-center justify-center space-x-3">
+              <a href="{% url 'core:equipment_detail' item.pk %}" 
+                 class="text-navy hover:text-navy-dark smooth-transition" 
+                 title="View">
+                <i class="bi bi-eye text-lg"></i>
+              </a>
+              <a href="{% url 'core:equipment_update' item.pk %}" 
+                 class="text-blue-600 hover:text-blue-800 smooth-transition" 
+                 title="Edit">
+                <i class="bi bi-pencil text-lg"></i>
+              </a>
+              <a href="{% url 'core:equipment_delete' item.pk %}" 
+                 class="text-red-600 hover:text-red-800 smooth-transition" 
+                 title="Delete">
+                <i class="bi bi-trash text-lg"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="px-3 py-12 text-center">
+            <i class="bi bi-{{ empty_icon }} text-4xl text-gray-400 mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No {{ entity_name_plural }} found</h3>
+            <p class="text-gray-500 mb-4">Get started by adding your first {{ entity_name_singular }}.</p>
+            <a href="{% url 'core:equipment_create' %}" 
+               class="inline-flex items-center px-4 py-2 bg-navy hover:bg-navy-dark text-white font-medium rounded-lg smooth-transition">
+              <i class="bi bi-plus-lg mr-2"></i>
+              Add {{ entity_name_singular|title }}
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endwith %}

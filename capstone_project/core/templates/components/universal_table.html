@@ -1,0 +1,213 @@
+<!-- Universal Table Component -->
+<!-- Usage: {% include 'components/universal_table.html' with config=table_config items=entity_list %} -->
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+  <!-- Mobile Cards (shown on small screens) -->
+  <div class="block sm:hidden">
+    {% for item in items %}
+    <div class="border-b border-gray-200 last:border-b-0 p-4">
+      <div class="flex items-start justify-between mb-3">
+        <div class="min-w-0 flex-1">
+          <h3 class="text-base font-semibold text-gray-900 truncate">
+            {% for column in config.columns %}
+              {% if column.field == config.primary_field %}
+                {% if column.field == 'name' %}{{ item.name|default:"—" }}{% endif %}
+                {% if column.field == 'title' %}{{ item.title|default:"—" }}{% endif %}
+              {% endif %}
+            {% endfor %}
+          </h3>
+          {% if config.mobile_subtitle %}
+          <p class="text-sm text-gray-500 mt-1">
+            {% for field in config.mobile_subtitle %}
+              {% if not forloop.first %} • {% endif %}
+              {% if field == 'facility' or field == 'FacilityId' %}{{ item.facility.name|default:item.FacilityId.name|default:"—" }}{% endif %}
+              {% if field == 'program' %}{{ item.program.name|default:"—" }}{% endif %}
+              {% if field == 'location' %}{{ item.location|default:"—" }}{% endif %}
+              {% if field == 'partner' %}{{ item.partner|default:"—" }}{% endif %}
+              {% if field == 'category' %}{{ item.category|default:"—" }}{% endif %}
+              {% if field == 'usage_domain' %}{{ item.usage_domain|default:"—" }}{% endif %}
+            {% endfor %}
+          </p>
+          {% endif %}
+        </div>
+        {% if config.mobile_badge %}
+        <div class="ml-3">
+          {% for badge in config.mobile_badge %}
+            <span class="bg-{{ badge.color }}-100 text-{{ badge.color }}-800 text-xs font-medium px-2.5 py-1 rounded-full">
+              {% if badge.field == 'category' %}{{ item.category|default:"—" }}{% endif %}
+              {% if badge.field == 'skill_type' %}{{ item.skill_type|default:"—" }}{% endif %}
+              {% if badge.field == 'prototype_stage' %}{{ item.prototype_stage|default:"—" }}{% endif %}
+              {% if badge.field == 'usage_domain' %}{{ item.usage_domain|default:"—" }}{% endif %}
+              {% if badge.field == 'active' %}
+                {% if item.active %}Active{% else %}Inactive{% endif %}
+              {% endif %}
+            </span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      
+      {% if config.mobile_details %}
+      <div class="space-y-2 mb-4">
+        {% for detail in config.mobile_details %}
+        <div class="flex items-center text-sm text-gray-600">
+          <i class="bi bi-{{ detail.icon }} mr-2 flex-shrink-0"></i>
+          <span>
+            {% if detail.field == 'description' %}{{ item.description|truncatechars:detail.truncate|default:"—" }}{% endif %}
+            {% if detail.field == 'national_alignment' %}{{ item.national_alignment|truncatechars:detail.truncate|default:"—" }}{% endif %}
+            {% if detail.field == 'nature_of_project' %}{{ item.nature_of_project|default:"—" }}{% endif %}
+            {% if detail.field == 'innovation_focus' %}{{ item.innovation_focus|default:"—" }}{% endif %}
+            {% if detail.field == 'start_date' %}{{ item.start_date|default:"No start date" }} - {{ item.end_date|default:"Ongoing" }}{% endif %}
+          </span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+      <div class="flex items-center space-x-4">
+        <a href="{% url config.urls.detail item.pk %}" 
+           class="flex items-center text-sm text-navy hover:text-navy-dark font-medium">
+          <i class="bi bi-eye mr-1.5"></i>
+          View
+        </a>
+        <a href="{% url config.urls.edit item.pk %}" 
+           class="flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium">
+          <i class="bi bi-pencil mr-1.5"></i>
+          Edit
+        </a>
+        <a href="{% url config.urls.delete item.pk %}" 
+           class="flex items-center text-sm text-red-600 hover:text-red-800 font-medium">
+          <i class="bi bi-trash mr-1.5"></i>
+          Delete
+        </a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="p-8 text-center">
+      <i class="bi bi-{{ config.empty_icon }} text-4xl text-gray-400 mb-4"></i>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No {{ config.entity_name_plural }} found</h3>
+      <p class="text-gray-500 mb-4">Get started by creating your first {{ config.entity_name_singular }}.</p>
+      <a href="{% url config.urls.create %}" 
+         class="inline-flex items-center px-4 py-2 bg-navy hover:bg-navy-dark text-white font-medium rounded-lg smooth-transition">
+        <i class="bi bi-plus-lg mr-2"></i>
+        Create {{ config.entity_name_singular|title }}
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Desktop Table (shown on larger screens) -->
+  <div class="hidden sm:block overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          {% for column in config.columns %}
+          <th class="{% if column.hidden %}hidden {{ column.hidden }}:table-cell {% endif %}px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            {{ column.header }}
+          </th>
+          {% endfor %}
+          <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for item in items %}
+        <tr class="hover:bg-gray-50 smooth-transition">
+          {% for column in config.columns %}
+          <td class="{% if column.hidden %}hidden {{ column.hidden }}:table-cell {% endif %}px-3 py-3">
+            {% if column.field == config.primary_field %}
+              <div class="flex flex-col">
+                <div class="font-medium text-gray-900">
+                  {% if column.field == 'name' %}{{ item.name|default:"—" }}{% endif %}
+                  {% if column.field == 'title' %}{{ item.title|default:"—" }}{% endif %}
+                </div>
+                {% if config.mobile_subtitle %}
+                <div class="sm:hidden text-sm text-gray-500 mt-1">
+                  {% for field in config.mobile_subtitle %}
+                    {% if not forloop.first %} • {% endif %}
+                    {% if field == 'facility' or field == 'FacilityId' %}{{ item.facility.name|default:item.FacilityId.name|default:"—" }}{% endif %}
+                    {% if field == 'program' %}{{ item.program.name|default:"—" }}{% endif %}
+                    {% if field == 'location' %}{{ item.location|default:"—" }}{% endif %}
+                    {% if field == 'partner' %}{{ item.partner|default:"—" }}{% endif %}
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+            {% elif column.type == 'badge' %}
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ column.color }}-100 text-{{ column.color }}-800">
+                {% if column.field == 'category' %}{{ item.category|default:"—" }}{% endif %}
+                {% if column.field == 'skill_type' %}{{ item.skill_type|default:"—" }}{% endif %}
+                {% if column.field == 'prototype_stage' %}{{ item.prototype_stage|default:"—" }}{% endif %}
+                {% if column.field == 'usage_domain' %}{{ item.usage_domain|default:"—" }}{% endif %}
+                {% if column.field == 'facility_type' %}{{ item.facility_type|default:"—" }}{% endif %}
+              </span>
+            {% elif column.type == 'status' %}
+              {% if item.active %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <svg class="w-1.5 h-1.5 mr-1.5" fill="currentColor" viewBox="0 0 8 8">
+                    <circle cx="4" cy="4" r="3"/>
+                  </svg>
+                  Active
+                </span>
+              {% else %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  <svg class="w-1.5 h-1.5 mr-1.5" fill="currentColor" viewBox="0 0 8 8">
+                    <circle cx="4" cy="4" r="3"/>
+                  </svg>
+                  Inactive
+                </span>
+              {% endif %}
+            {% else %}
+              <div class="{% if column.truncate %}max-w-xs truncate {% endif %}text-sm {% if column.muted %}text-gray-500{% else %}text-gray-900{% endif %}">
+                {% if column.field == 'facility' or column.field == 'FacilityId' %}{{ item.facility.name|default:item.FacilityId.name|default:"—" }}{% endif %}
+                {% if column.field == 'program' %}{{ item.program.name|default:"—" }}{% endif %}
+                {% if column.field == 'location' %}{{ item.location|default:"—" }}{% endif %}
+                {% if column.field == 'partner' %}{{ item.partner|default:"—" }}{% endif %}
+                {% if column.field == 'description' %}{{ item.description|default:"—" }}{% endif %}
+                {% if column.field == 'national_alignment' %}{{ item.national_alignment|default:"—" }}{% endif %}
+                {% if column.field == 'start_date' %}{{ item.start_date|default:"—" }}{% endif %}
+                {% if column.field == 'end_date' %}{{ item.end_date|default:"Ongoing" }}{% endif %}
+                {% if column.field == 'nature_of_project' %}{{ item.nature_of_project|default:"—" }}{% endif %}
+                {% if column.field == 'innovation_focus' %}{{ item.innovation_focus|default:"—" }}{% endif %}
+                {% if column.field == 'capabilities' %}{{ item.capabilities|default:"—" }}{% endif %}
+              </div>
+            {% endif %}
+          </td>
+          {% endfor %}
+          <td class="px-3 py-3">
+            <div class="flex items-center justify-center space-x-3">
+              <a href="{% url config.urls.detail item.pk %}" 
+                 class="text-navy hover:text-navy-dark smooth-transition" 
+                 title="View">
+                <i class="bi bi-eye text-lg"></i>
+              </a>
+              <a href="{% url config.urls.edit item.pk %}" 
+                 class="text-blue-600 hover:text-blue-800 smooth-transition" 
+                 title="Edit">
+                <i class="bi bi-pencil text-lg"></i>
+              </a>
+              <a href="{% url config.urls.delete item.pk %}" 
+                 class="text-red-600 hover:text-red-800 smooth-transition" 
+                 title="Delete">
+                <i class="bi bi-trash text-lg"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="{{ config.columns|length|add:1 }}" class="px-3 py-12 text-center">
+            <i class="bi bi-{{ config.empty_icon }} text-4xl text-gray-400 mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No {{ config.entity_name_plural }} found</h3>
+            <p class="text-gray-500 mb-4">Get started by creating your first {{ config.entity_name_singular }}.</p>
+            <a href="{% url config.urls.create %}" 
+               class="inline-flex items-center px-4 py-2 bg-navy hover:bg-navy-dark text-white font-medium rounded-lg smooth-transition">
+              <i class="bi bi-plus-lg mr-2"></i>
+              Create {{ config.entity_name_singular|title }}
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

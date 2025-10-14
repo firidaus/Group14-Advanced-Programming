@@ -1,0 +1,172 @@
+<!-- Responsive Participant Table Component -->
+<div class="overflow-x-auto">
+  <!-- Mobile Cards View (hidden on desktop) -->
+  <div class="block md:hidden space-y-4">
+    {% for participant in participants %}
+      <div class="bg-white rounded-lg shadow border border-gray-200 p-4">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex-1">
+            <h3 class="font-semibold text-gray-900 mb-1">
+              <i class="bi bi-person-fill text-navy-700 mr-2"></i>
+              {{ participant.full_name }}
+            </h3>
+            <p class="text-sm text-gray-600 mb-2">
+              <i class="bi bi-envelope text-gray-400 mr-1"></i>
+              {{ participant.email }}
+            </p>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <div>
+            <span class="font-medium text-gray-500">Affiliation:</span>
+            <p class="text-gray-900">{{ participant.affiliation|truncatechars:20 }}</p>
+          </div>
+          <div>
+            <span class="font-medium text-gray-500">Specialization:</span>
+            <p class="text-gray-900">{{ participant.get_specialization_display }}</p>
+          </div>
+          <div>
+            <span class="font-medium text-gray-500">Cross-Skill:</span>
+            {% if participant.cross_skill_trained %}
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <i class="bi bi-check-circle mr-1"></i> Yes
+              </span>
+            {% else %}
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                <i class="bi bi-x-circle mr-1"></i> No
+              </span>
+            {% endif %}
+          </div>
+          <div>
+            <span class="font-medium text-gray-500">Institution:</span>
+            <p class="text-gray-900">{{ participant.get_institution_display }}</p>
+          </div>
+        </div>
+        
+        <div class="mt-3 pt-3 border-t border-gray-200">
+          <span class="font-medium text-gray-500 block mb-1">Project:</span>
+          <p class="text-gray-900 text-sm">{{ participant.project.title|truncatechars:40 }}</p>
+        </div>
+        
+        <div class="flex justify-end space-x-2 mt-4 pt-3 border-t border-gray-200">
+          <a href="{% url 'core:participant_detail' participant.pk %}" 
+             class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium text-navy-700 bg-navy-50 hover:bg-navy-100">
+            <i class="bi bi-eye mr-1"></i> View
+          </a>
+          <a href="{% url 'core:participant_update' participant.pk %}" 
+             class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100">
+            <i class="bi bi-pencil mr-1"></i> Edit
+          </a>
+          <a href="{% url 'core:participant_delete' participant.pk %}" 
+             class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100">
+            <i class="bi bi-trash mr-1"></i> Delete
+          </a>
+        </div>
+      </div>
+    {% empty %}
+      <div class="text-center py-8">
+        <i class="bi bi-people text-gray-300 text-4xl mb-4"></i>
+        <p class="text-gray-500">No participants found.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Desktop Table View (hidden on mobile) -->
+  <div class="hidden md:block">
+    <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg shadow">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <i class="bi bi-person text-navy-700 mr-1"></i> Participant
+          </th>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <i class="bi bi-building text-navy-700 mr-1"></i> Affiliation
+          </th>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <i class="bi bi-gear text-navy-700 mr-1"></i> Specialization
+          </th>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <i class="bi bi-arrow-repeat text-navy-700 mr-1"></i> Cross-Skill
+          </th>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <i class="bi bi-bank text-navy-700 mr-1"></i> Institution
+          </th>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <i class="bi bi-folder text-navy-700 mr-1"></i> Project
+          </th>
+          <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <i class="bi bi-gear-fill text-navy-700 mr-1"></i> Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for participant in participants %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-3 py-3 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-8 w-8">
+                  <div class="h-8 w-8 rounded-full bg-navy-100 flex items-center justify-center">
+                    <i class="bi bi-person-fill text-navy-600 text-sm"></i>
+                  </div>
+                </div>
+                <div class="ml-3">
+                  <div class="text-sm font-medium text-gray-900">{{ participant.full_name }}</div>
+                  <div class="text-sm text-gray-500">{{ participant.email }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ participant.affiliation|truncatechars:30 }}</div>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {{ participant.get_specialization_display }}
+              </span>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap">
+              {% if participant.cross_skill_trained %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <i class="bi bi-check-circle mr-1"></i> Yes
+                </span>
+              {% else %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  <i class="bi bi-x-circle mr-1"></i> No
+                </span>
+              {% endif %}
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ participant.get_institution_display }}</div>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ participant.project.title|truncatechars:30 }}</div>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap text-center text-sm font-medium">
+              <div class="flex justify-center space-x-2">
+                <a href="{% url 'core:participant_detail' participant.pk %}" 
+                   class="text-navy-600 hover:text-navy-900 p-1 rounded" title="View Details">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="{% url 'core:participant_update' participant.pk %}" 
+                   class="text-blue-600 hover:text-blue-900 p-1 rounded" title="Edit">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'core:participant_delete' participant.pk %}" 
+                   class="text-red-600 hover:text-red-900 p-1 rounded" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" class="px-3 py-8 text-center text-gray-500">
+              <i class="bi bi-people text-gray-300 text-4xl mb-4"></i>
+              <p>No participants found.</p>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

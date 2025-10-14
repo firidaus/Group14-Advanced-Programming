@@ -1,0 +1,24 @@
+<!-- Universal List Template -->
+<!-- Usage: Extend this template and provide table_config and items in context -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="space-y-4 sm:space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+    <h1 class="text-xl sm:text-2xl font-bold text-gray-900">{{ page_title }}</h1>
+    <a href="{% url create_url %}" 
+       class="inline-flex items-center justify-center px-4 py-2.5 bg-navy hover:bg-navy-dark text-white font-medium rounded-lg smooth-transition touch-target">
+      <i class="bi bi-plus-lg mr-2"></i>
+      <span>New {{ entity_name_singular|title }}</span>
+    </a>
+  </div>
+
+  <!-- Optional Filter Form Block -->
+  {% block filter_form %}
+  {% endblock %}
+
+  <!-- Universal Table -->
+  {% include 'components/universal_table.html' with config=table_config items=items %}
+</div>
+{% endblock %}

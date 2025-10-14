@@ -1,17 +1,18 @@
-{% extends 'base.html' %} <!-- Remove if no base.html -->
+{% extends 'base.html' %}
+
 {% block content %}
-<h1>All Equipment</h1>
-<ul>
-    {% for equipment in equipments %}
-    <li>
-        {{ equipment.name }} ({{ equipment.usage_domain }}) - Facility: {{ equipment.facility.name }}
-        <a href="{% url 'core:equipment_detail' equipment.pk %}">View</a>
-        <a href="{% url 'core:equipment_update' equipment.pk %}">Edit</a>
-        <a href="{% url 'core:equipment_delete' equipment.pk %}">Delete</a>
-    </li>
-    {% empty %}
-    <li>No equipment found.</li>
-    {% endfor %}
-</ul>
-<a href="{% url 'core:equipment_create' %}">Create New Equipment</a>
+<div class="space-y-4 sm:space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+    <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Equipment</h1>
+    <a href="{% url 'core:equipment_create' %}" 
+       class="inline-flex items-center justify-center px-4 py-2.5 bg-navy hover:bg-navy-dark text-white font-medium rounded-lg smooth-transition touch-target">
+      <i class="bi bi-plus-lg mr-2"></i>
+      <span>New Equipment</span>
+    </a>
+  </div>
+
+  <!-- Equipment Table Component -->
+  {% include 'components/equipment_table.html' with items=equipments %}
+</div>
 {% endblock %}

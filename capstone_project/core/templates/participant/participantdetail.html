@@ -1,55 +1,72 @@
 {% extends 'base.html' %}
 
-{% block title %}Participant Details{% endblock %}
+{% block title %}{{ participant.full_name }} - Participant Details{% endblock %}
 
 {% block content %}
-<div class="bg-white p-6 rounded shadow">
-    <h2 class="text-2xl font-bold mb-4">{{ participant.full_name }}</h2>
+<div class="max-w-3xl mx-auto">
+  <!-- Compact Header -->
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-bold text-gray-900">{{ participant.full_name }}</h1>
+    <a href="{% url 'core:participant_list' %}" class="text-gray-600 hover:text-gray-800">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
 
+  <!-- Detail Card -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
     <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-        <div>
-            <dt class="font-semibold text-gray-600">Email</dt>
-            <dd>{{ participant.email }}</dd>
-        </div>
-        <div>
-            <dt class="font-semibold text-gray-600">Affiliation</dt>
-            <dd>{{ participant.affiliation }}</dd>
-        </div>
-        <div>
-            <dt class="font-semibold text-gray-600">Specialization</dt>
-            <dd>{{ participant.get_specialization_display }}</dd>
-        </div>
-        <div>
-            <dt class="font-semibold text-gray-600">Cross-Skill Trained</dt>
-            <dd>
-                {% if participant.cross_skill_trained %}
-                    ✅ Yes
-                {% else %}
-                    ❌ No
-                {% endif %}
-            </dd>
-        </div>
-        <div>
-            <dt class="font-semibold text-gray-600">Institution</dt>
-            <dd>{{ participant.get_institution_display }}</dd>
-        </div>
-        <div>
-            <dt class="font-semibold text-gray-600">Project</dt>
-            <dd>{{ participant.project.title }}</dd>
-        </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-700">Email</dt>
+        <dd class="mt-1 text-sm text-gray-900">{{ participant.email }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-700">Affiliation</dt>
+        <dd class="mt-1 text-sm text-gray-900">{{ participant.affiliation }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-700">Specialization</dt>
+        <dd class="mt-1 text-sm text-gray-900">{{ participant.get_specialization_display }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-700">Cross-Skill Trained</dt>
+        <dd class="mt-1">
+          {% if participant.cross_skill_trained %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              <i class="bi bi-check-circle-fill mr-1"></i> Yes
+            </span>
+          {% else %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+              <i class="bi bi-x-circle-fill mr-1"></i> No
+            </span>
+          {% endif %}
+        </dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-700">Institution</dt>
+        <dd class="mt-1 text-sm text-gray-900">{{ participant.get_institution_display }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-700">Project</dt>
+        <dd class="mt-1 text-sm text-gray-900">{{ participant.project.title }}</dd>
+      </div>
     </dl>
 
-   <div class="space-x-2">
-    
-  <a href="{% url 'core:participant_update' participant.pk %}" class="bg-indigo-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-    <i class="bi bi-pencil"></i> Edit
-  </a>
-  <a href="{% url 'core:participant_list' %}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-    Cancel
-  </a>
-  <a href="{% url 'core:participant_delete' participant.pk %}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-    Delete
-  </a>
-</div>
+    <!-- Standardized Action Buttons -->
+    <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+      <a href="{% url 'core:participant_update' participant.pk %}" 
+         class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-navy hover:bg-navy-dark touch-target">
+        <i class="bi bi-pencil mr-2"></i>
+        Edit
+      </a>
+      <a href="{% url 'core:participant_list' %}" 
+         class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 touch-target">
+        Cancel
+      </a>
+      <a href="{% url 'core:participant_delete' participant.pk %}" 
+         class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 touch-target">
+        Delete
+      </a>
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -1,53 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="flex items-center justify-between mb-4">
-  <h1 class="text-2xl font-bold">Participants</h1>
-  <a href="{% url 'core:participant_create' %}" class="bg-indigo-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-    <i class="bi bi-plus-lg"></i> New Participant
-  </a>
-</div>
+<div class="space-y-4 sm:space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+    <h1 class="text-xl sm:text-2xl font-bold text-gray-900">
+      <i class="bi bi-people-fill text-navy mr-2"></i>
+      Participants
+    </h1>
+    <a href="{% url 'core:participant_create' %}" 
+       class="inline-flex items-center justify-center px-4 py-2.5 bg-navy hover:bg-navy-dark text-white font-medium rounded-lg smooth-transition touch-target">
+      <i class="bi bi-plus-lg mr-2"></i>
+      <span>New Participant</span>
+    </a>
+  </div>
 
-<!-- Participant Table -->
-<table class="min-w-full border divide-y divide-gray-200">
-  <thead class="bg-gray-50">
-    <tr>
-      <th class="px-4 py-2 text-left">Full Name</th>
-      <th class="px-4 py-2 text-left">Email</th>
-      <th class="px-4 py-2 text-left">Affiliation</th>
-      <th class="px-4 py-2 text-left">Specialization</th>
-      <th class="px-4 py-2 text-left">Cross-Skill Trained</th>
-      <th class="px-4 py-2 text-left">Institution</th>
-      <th class="px-4 py-2 text-left">Project</th>
-      <th class="px-4 py-2 text-center">Actions</th>
-    </tr>
-  </thead>
-  <tbody class="bg-white divide-y divide-gray-200">
-    {% for participant in participants %}
-    <tr>
-      <td class="px-4 py-2">{{ participant.full_name }}</td>
-      <td class="px-4 py-2">{{ participant.email }}</td>
-      <td class="px-4 py-2">{{ participant.affiliation }}</td>
-      <td class="px-4 py-2">{{ participant.get_specialization_display }}</td>
-      <td class="px-4 py-2">
-        {% if participant.cross_skill_trained %}
-          ✅ Yes
-        {% else %}
-          ❌ No
-        {% endif %}
-      </td>
-      <td class="px-4 py-2">{{ participant.get_institution_display }}</td>
-      <td class="px-4 py-2">{{ participant.project.title }}</td>
-      <td class="px-4 py-2 text-center space-x-2">
-        <a href="{% url 'core:participant_detail' participant.pk %}" class="text-blue-600 hover:text-blue-800"><i class="bi bi-eye"></i></a>
-        <a href="{% url 'core:participant_update' participant.pk %}" class="text-blue-600 hover:text-blue-800"><i class="bi bi-pencil"></i></a>
-        <a href="{% url 'core:participant_delete' participant.pk %}" class="text-red-600 hover:text-red-800"><i class="bi bi-trash"></i></a>
-      </td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="8" class="px-4 py-2 text-gray-500 text-center">No participants found.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <!-- Participant Table Component -->
+  {% include 'components/participant_table.html' %}
+</div>
 {% endblock %}

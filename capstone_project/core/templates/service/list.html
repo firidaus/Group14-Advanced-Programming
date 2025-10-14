@@ -1,69 +1,42 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-4">
-  <h1 class="text-2xl font-bold">Services</h1>
-  <a href="{% url 'core:service_create' %}" class="bg-indigo-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-    <i class="bi bi-plus-lg"></i> New Service
-  </a>
+<div class="space-y-4 sm:space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+    <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Services</h1>
+    <a href="{% url 'core:service_create' %}" 
+       class="inline-flex items-center justify-center px-4 py-2.5 bg-navy hover:bg-navy-dark text-white font-medium rounded-lg smooth-transition touch-target">
+      <i class="bi bi-plus-lg mr-2"></i>
+      <span>New Service</span>
+    </a>
+  </div>
+
+  <!-- Filter Form -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+    <form method="get" class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+      <select name="category" class="border border-gray-300 rounded-md px-3 py-2 focus:ring-navy focus:border-navy">
+        <option value="">All Categories</option>
+        {% for category in categories %}
+          <option value="{{ category }}" {% if request.GET.category == category %}selected{% endif %}>{{ category }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="skill_type" class="border border-gray-300 rounded-md px-3 py-2 focus:ring-navy focus:border-navy">
+        <option value="">All Skill Types</option>
+        {% for skill_type in skill_types %}
+          <option value="{{ skill_type }}" {% if request.GET.skill_type == skill_type %}selected{% endif %}>{{ skill_type }}</option>
+        {% endfor %}
+      </select>
+
+      <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-navy hover:bg-navy-dark text-white font-medium rounded-md smooth-transition">
+        <i class="bi bi-funnel mr-2"></i>
+        Filter
+      </button>
+    </form>
+  </div>
+
+  <!-- Service Table Component -->
+  {% include 'components/service_table.html' with items=services %}
 </div>
-
-<!-- Filter Form -->
-<form method="get" class="flex space-x-4 mb-4">
-  <select name="category" class="border rounded p-2">
-    <option value="">All Categories</option>
-    {% for category in categories %}
-      <option value="{{ category }}" {% if request.GET.category == category %}selected{% endif %}>{{ category }}</option>
-    {% endfor %}
-  </select>
-
-  <select name="skill_type" class="border rounded p-2">
-    <option value="">All Skill Types</option>
-    {% for skill_type in skill_types %}
-      <option value="{{ skill_type }}" {% if request.GET.skill_type == skill_type %}selected{% endif %}>{{ skill_type }}</option>
-    {% endfor %}
-  </select>
-
-  <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-    Filter
-  </button>
-</form>
-
-<!-- Services Table -->
-<table class="min-w-full border divide-y divide-gray-200">
-  <thead class="bg-gray-50">
-    <tr>
-      <th class="px-4 py-2 text-left">Name</th>
-      <th class="px-4 py-2 text-left">Category</th>
-      <th class="px-4 py-2 text-left">Skill Type</th>
-      <th class="px-4 py-2 text-left">Facility</th>
-      <th class="px-4 py-2 text-left">Description</th>
-      <th class="px-4 py-2 text-center">Actions</th>
-    </tr>
-  </thead>
-  <tbody class="bg-white divide-y divide-gray-200">
-    {% for service in services %}
-    <tr>
-      <td class="px-4 py-2 font-medium">{{ service.name }}</td>
-      <td class="px-4 py-2">
-        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ service.category }}</span>
-      </td>
-      <td class="px-4 py-2">
-        <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ service.skill_type }}</span>
-      </td>
-      <td class="px-4 py-2">{{ service.FacilityId.name }}</td>
-      <td class="px-4 py-2">{{ service.description|truncatechars:50 }}</td>
-      <td class="px-4 py-2 text-center space-x-2">
-        <a href="{% url 'core:service_detail' service.ServiceId %}" class="text-blue-600 hover:text-blue-800"><i class="bi bi-eye"></i></a>
-        <a href="{% url 'core:service_update' service.ServiceId %}" class="text-blue-600 hover:text-blue-800"><i class="bi bi-pencil"></i></a>
-        <a href="{% url 'core:service_delete' service.ServiceId %}" class="text-red-600 hover:text-red-800"><i class="bi bi-trash"></i></a>
-      </td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="6" class="px-4 py-2 text-gray-500 text-center">No services found.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
 {% endblock %}

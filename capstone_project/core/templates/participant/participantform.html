@@ -1,74 +1,145 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="flex justify-center mt-10">
-  <div class="w-full max-w-3xl bg-white shadow-md rounded-lg p-6">
-    <h1 class="text-2xl font-bold mb-6 text-gray-800 text-center">
-      {% if form.instance.pk %}Edit{% else %}New{% endif %} Participant
+<div class="max-w-3xl mx-auto">
+  <!-- Compact Header -->
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-bold text-gray-900">
+      {% if form.instance.pk %}Edit Participant{% else %}Create Participant{% endif %}
     </h1>
+    <a href="{% url 'core:participant_list' %}" class="text-gray-600 hover:text-gray-800">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
 
+  <!-- Compact Form -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
     <form method="post" class="space-y-4">
       {% csrf_token %}
-      {{ form.non_field_errors }}
+      
+      {% if form.non_field_errors %}
+        <div class="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded">
+          {{ form.non_field_errors|first }}
+        </div>
+      {% endif %}
+      
+      <!-- Form Fields -->
+      {% for field in form %}
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{ field.label }}
+            {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ field }}
+          {% if field.errors %}
+            <div class="mt-1 text-sm text-red-600">
+              {{ field.errors|first }}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      
+      <!-- Standardized Form Buttons -->
+      <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+        <a href="{% url 'core:participant_list' %}" 
+           class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 touch-target">
+          Cancel
+        </a>
+        <button type="submit" 
+                class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-navy hover:bg-navy-dark touch-target">
+          <i class="bi bi-check-lg mr-2"></i>
+          Save Participant
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="errorlist bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
 
       <!-- Row 1: Full Name & Email -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Full Name</label>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.full_name.id_for_label }}">Full Name</label>
           {{ form.full_name }}
-          {{ form.full_name.errors }}
+          {% if form.full_name.errors %}
+            <div class="errorlist">{{ form.full_name.errors }}</div>
+          {% endif %}
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Email</label>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
           {{ form.email }}
-          {{ form.email.errors }}
+          {% if form.email.errors %}
+            <div class="errorlist">{{ form.email.errors }}</div>
+          {% endif %}
         </div>
       </div>
 
       <!-- Row 2: Affiliation & Specialization -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Affiliation</label>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.affiliation.id_for_label }}">Affiliation</label>
           {{ form.affiliation }}
-          {{ form.affiliation.errors }}
+          {% if form.affiliation.errors %}
+            <div class="errorlist">{{ form.affiliation.errors }}</div>
+          {% endif %}
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Specialization</label>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.specialization.id_for_label }}">Specialization</label>
           {{ form.specialization }}
-          {{ form.specialization.errors }}
+          {% if form.specialization.errors %}
+            <div class="errorlist">{{ form.specialization.errors }}</div>
+          {% endif %}
         </div>
       </div>
 
       <!-- Row 3: Cross-Skill & Institution -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="flex items-center space-x-2">
-          <label class="block text-sm font-medium text-gray-700">Cross-Skill Trained</label>
-          {{ form.cross_skill_trained }}
-          {{ form.cross_skill_trained.errors }}
+        <div class="form-group">
+          <label class="form-label flex items-center">
+            {{ form.cross_skill_trained }}
+            <span class="ml-2">Cross-Skill Trained</span>
+          </label>
+          {% if form.cross_skill_trained.errors %}
+            <div class="errorlist">{{ form.cross_skill_trained.errors }}</div>
+          {% endif %}
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Institution</label>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.institution.id_for_label }}">Institution</label>
           {{ form.institution }}
-          {{ form.institution.errors }}
+          {% if form.institution.errors %}
+            <div class="errorlist">{{ form.institution.errors }}</div>
+          {% endif %}
         </div>
       </div>
 
       <!-- Row 4: Project -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Project</label>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.project.id_for_label }}">Project</label>
         {{ form.project }}
-        {{ form.project.errors }}
+        {% if form.project.errors %}
+          <div class="errorlist">{{ form.project.errors }}</div>
+        {% endif %}
       </div>
 
-      <!-- Buttons -->
-      <div class="flex items-center space-x-3 pt-4">
-        <a href="{% url 'core:participant_list' %}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded">
+      <!-- Standardized Form Buttons -->
+      <!-- Standardized Action Buttons -->
+      <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+        <a href="{% url 'core:participant_list' %}" 
+           class="inline-flex items-center justify-center px-6 py-2.5 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-medium rounded-lg touch-target">
+          <i class="bi bi-x-lg mr-2"></i>
           Cancel
         </a>
-        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded">
+        <button type="submit" 
+                class="inline-flex items-center justify-center px-6 py-2.5 bg-navy hover:bg-navy-dark text-white font-medium rounded-lg touch-target">
+          <i class="bi bi-check-lg mr-2"></i>
           Save
         </button>
-        
       </div>
     </form>
   </div>

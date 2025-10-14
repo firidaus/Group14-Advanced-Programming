@@ -1,10 +1,60 @@
-{% extends 'base.html' %} <!-- Remove if no base.html -->
+{% extends 'base.html' %}
+
+{% block title %}Delete Equipment - {{ equipment.name }}{% endblock %}
+
 {% block content %}
-<h1>Delete {{ equipment.name }}?</h1>
-<p>Are you sure? This cannot be undone.</p>
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Yes, Delete</button>
-</form>
-<a href="{% url 'core:equipment_list' %}">Cancel</a>
+<div class="max-w-3xl mx-auto">
+  <!-- Compact Header -->
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-bold text-gray-900">Delete Equipment</h1>
+    <a href="{% url 'core:equipment_detail' equipment.pk %}" class="text-gray-600 hover:text-gray-800">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+
+  <!-- Confirmation Card -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div class="flex items-center mb-4">
+      <div class="flex-shrink-0">
+        <div class="flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+          <i class="bi bi-exclamation-triangle text-red-600 text-xl"></i>
+        </div>
+      </div>
+      <div class="ml-4">
+        <h3 class="text-lg font-medium text-gray-900">
+          Confirm Deletion
+        </h3>
+        <p class="text-sm text-gray-500">
+          This action cannot be undone.
+        </p>
+      </div>
+    </div>
+
+    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+      <p class="text-sm text-gray-700 mb-3">
+        Are you sure you want to delete "<strong>{{ equipment.name }}</strong>"?
+      </p>
+      <dl class="text-sm text-gray-600 space-y-1">
+        <div><dt class="inline font-medium">Facility:</dt> {{ equipment.facility.name }}</div>
+        <div><dt class="inline font-medium">Inventory Code:</dt> {{ equipment.inventory_code }}</div>
+      </dl>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <!-- Standardized Confirmation Buttons -->
+      <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+        <a href="{% url 'core:equipment_detail' equipment.pk %}" 
+           class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 touch-target">
+          Cancel
+        </a>
+        <button type="submit" 
+                class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 touch-target">
+          <i class="bi bi-trash mr-2"></i>
+          Confirm Delete
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

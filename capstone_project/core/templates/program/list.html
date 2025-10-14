@@ -1,52 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-4">
-  <h1 class="text-2xl font-bold">Programs</h1>
-  <a href="{% url 'core:program_create' %}" class="bg-indigo-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-    <i class="bi bi-plus-lg"></i> New Program
-  </a>
-</div>
+<div class="space-y-4 sm:space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+    <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Programs</h1>
+    <a href="{% url 'core:program_create' %}" 
+       class="inline-flex items-center justify-center px-4 py-2.5 bg-navy hover:bg-navy-dark text-white font-medium rounded-lg smooth-transition touch-target">
+      <i class="bi bi-plus-lg mr-2"></i>
+      <span>New Program</span>
+    </a>
+  </div>
 
-<!-- Programs Table -->
-<table class="min-w-full border divide-y divide-gray-200">
-  <thead class="bg-gray-50">
-    <tr>
-      <th class="px-4 py-2 text-left">Name</th>
-      <th class="px-4 py-2 text-left">Start Date</th>
-      <th class="px-4 py-2 text-left">End Date</th>
-      <th class="px-4 py-2 text-left">Status</th>
-      <th class="px-4 py-2 text-left">National Alignment</th>
-      <th class="px-4 py-2 text-left">Description</th>
-      <th class="px-4 py-2 text-center">Actions</th>
-    </tr>
-  </thead>
-  <tbody class="bg-white divide-y divide-gray-200">
-    {% for program in programs %}
-    <tr>
-      <td class="px-4 py-2 font-medium">{{ program.name }}</td>
-      <td class="px-4 py-2">{{ program.start_date }}</td>
-      <td class="px-4 py-2">{{ program.end_date|default:"Ongoing" }}</td>
-      <td class="px-4 py-2">
-        {% if program.active %}
-          <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Active</span>
-        {% else %}
-          <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded">Inactive</span>
-        {% endif %}
-      </td>
-      <td class="px-4 py-2">{{ program.national_alignment|truncatechars:30 }}</td>
-      <td class="px-4 py-2">{{ program.description|truncatechars:50 }}</td>
-      <td class="px-4 py-2 text-center space-x-2">
-        <a href="{% url 'core:program_detail' program.ProgramId %}" class="text-blue-600 hover:text-blue-800"><i class="bi bi-eye"></i></a>
-        <a href="{% url 'core:program_update' program.ProgramId %}" class="text-blue-600 hover:text-blue-800"><i class="bi bi-pencil"></i></a>
-        <a href="{% url 'core:program_delete' program.ProgramId %}" class="text-red-600 hover:text-red-800"><i class="bi bi-trash"></i></a>
-      </td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="7" class="px-4 py-2 text-gray-500 text-center">No programs found.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <!-- Program Table Component -->
+  {% include 'components/program_table.html' with items=programs %}
+</div>
 {% endblock %}
+</table>
+
