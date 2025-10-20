@@ -1,5 +1,5 @@
 from django.db import models
-from .Faciltymodels import Facility
+from .Facility import Facility
 
 # Choices for usage domain
 USAGE_DOMAIN_CHOICES = [
