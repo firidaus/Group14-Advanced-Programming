@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 # Predefined choices for partners and facility types
 PARTNERS = [
@@ -28,7 +29,11 @@ class Facility(models.Model):
     description = models.TextField(blank=True)
     partner = models.CharField(max_length=50, choices=PARTNERS)
     facility_type = models.CharField(max_length=50, choices=FACILITY_TYPES)
-    capabilities = models.CharField(max_length=200,choices=CAPABILITIES_CHOICES)  # free text field; you can store comma-separated capabilities
+    capabilities = models.CharField(max_length=200, choices=CAPABILITIES_CHOICES)
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        if not self.name or not self.location:
+            raise ValidationError("Name and Location are required.")

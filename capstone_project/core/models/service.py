@@ -1,6 +1,6 @@
 # core/models/service.py
 from django.db import models
-from core.models.Faciltymodels import Facility
+from core.models.Facility import Facility
 
 class Service(models.Model):
     # Category choices based on your specification

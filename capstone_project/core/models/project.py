@@ -1,6 +1,6 @@
 from django.db import models
 from core.models.program import Program
-from core.models.Faciltymodels import Facility
+from core.models.Facility import Facility
 
 
 class Project(models.Model):
