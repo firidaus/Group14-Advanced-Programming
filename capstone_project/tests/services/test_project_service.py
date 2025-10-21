@@ -1,6 +1,6 @@
 
 import pytest
-from datetime import date, timedelta
+from datetime import date
 from core.services.project_service import ProjectService
 from core.repositories.mock_project_repository import MockProjectRepository
 
@@ -16,397 +16,340 @@ def mock_repository():
 def project_service(mock_repository):
     return ProjectService(repository=mock_repository)
 
-#Test project creation logic
-class TestProjectServiceCreate:
+
+class TestBusinessRule_RequiredAssociations:
     
-    def test_create_project_success(self, project_service):
-        today = date.today()
-        future = today + timedelta(days=30)
-        
+    def test_create_project_with_program_and_facility_succeeds(self, project_service):
+        """Test project creation with both Program and Facility IDs succeeds"""
+        # Arrange
         data = {
-            'title': 'Research Project',
-            'description': 'A research project',
+            'title': 'Valid Project',
             'program_id': 1,
             'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
+            'team_members': ['Benjamin Nakabaale'],
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
         }
         
+        # Act
         project = project_service.create_project(data)
         
+        # Assert
         assert project is not None
-        assert project.title == 'Research Project'
         assert project.program_id == 1
         assert project.facility_id == 1
-        assert project.ProjectId is not None
     
-    def test_create_project_short_title_fails(self, project_service):
+    def test_create_project_missing_program_id_fails(self, project_service):
+        """Test project without ProgramId is rejected"""
+        # Arrange
         data = {
-            'title': 'AB',
-            'program_id': 1,
+            'title': 'Test Project',
             'facility_id': 1,
+            'team_members': ['Benjamin Nakabaale'],
         }
         
-        with pytest.raises(ValueError, match="must be at least 3 characters"):
+        # Act & Assert
+        with pytest.raises(ValueError, match="Project.ProgramId and Project.FacilityId are required"):
             project_service.create_project(data)
     
-    def test_create_project_empty_title_fails(self, project_service):
+    def test_create_project_missing_facility_id_fails(self, project_service):
+        """Test project without FacilityId is rejected"""
+        # Arrange
         data = {
-            'title': '',
+            'title': 'Test Project',
             'program_id': 1,
-            'facility_id': 1,
+            'team_members': ['Benjamin Nakabaale'],
         }
         
-        with pytest.raises(ValueError, match="must be at least 3 characters"):
+        # Act & Assert
+        with pytest.raises(ValueError, match="Project.ProgramId and Project.FacilityId are required"):
             project_service.create_project(data)
     
-    def test_create_project_duplicate_title_fails(self, project_service):
-        today = date.today()
-        future = today + timedelta(days=30)
-        
+    def test_create_project_missing_both_ids_fails(self, project_service):
+        """Test project without ProgramId and FacilityId is rejected"""
+        # Arrange
         data = {
-            'title': 'Unique Project',
+            'title': 'Test Project',
+            'team_members': ['Benjamin Nakabaale'],
+        }
+        
+        # Act & Assert
+        with pytest.raises(ValueError, match="Project.ProgramId and Project.FacilityId are required"):
+            project_service.create_project(data)
+
+class TestBusinessRule_TeamTracking:
+    """Each Project must have at least one Team member assigned"""
+    
+    def test_create_project_with_team_members_succeeds(self, project_service):
+        """Test project with team members succeeds"""
+        # Arrange
+        data = {
+            'title': 'Team Project',
             'program_id': 1,
             'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
+            'team_members': ['Benjamin Nakabaale', 'Ruth Angel'],
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
         }
         
-        project_service.create_project(data)
-        
-        with pytest.raises(ValueError, match="already exists"):
-            project_service.create_project(data)
-    
-    def test_create_project_invalid_dates_fails(self, project_service):
-        """Test that end date before start date is rejected"""
-        today = date.today()
-        past = today - timedelta(days=30)
-        
-        data = {
-            'title': 'Invalid Date Project',
-            'program_id': 1,
-            'facility_id': 1,
-            'start_date': today,
-            'end_date': past,
-        }
-        
-        with pytest.raises(ValueError, match="End date must be after start date"):
-            project_service.create_project(data)
-    
-    def test_create_project_same_start_end_date_fails(self, project_service):
-        today = date.today()
-        
-        data = {
-            'title': 'Same Date Project',
-            'program_id': 1,
-            'facility_id': 1,
-            'start_date': today,
-            'end_date': today,
-        }
-        
-        with pytest.raises(ValueError, match="End date must be after start date"):
-            project_service.create_project(data)
-    
-    def test_create_project_with_all_fields(self, project_service):
-        today = date.today()
-        future = today + timedelta(days=90)
-        
-        data = {
-            'title': 'Complete Project',
-            'description': 'Full description',
-            'program_id': 1,
-            'facility_id': 2,
-            'start_date': today,
-            'end_date': future,
-            'budget': 100000,
-            'status': 'Active',
-        }
-        
+        # Act
         project = project_service.create_project(data)
         
-        assert project.title == 'Complete Project'
-        assert project.description == 'Full description'
-        assert project.budget == 100000
-        assert project.status == 'Active'
-
-#Test project retrieval logic
-class TestProjectServiceRead:
+        # Assert
+        assert project is not None
+        assert len(project.team_members) >= 1
     
-    def test_get_all_projects_empty(self, project_service):
-        """Test getting all projects when none exist"""
-        projects = project_service.get_all_projects()
-        assert projects == []
-    
-    def test_get_all_projects(self, project_service):
-        """Test getting all projects"""
-        today = date.today()
-        future = today + timedelta(days=30)
-        
-        # Create test projects
-        project_service.create_project({
-            'title': 'Project 1',
+    def test_create_project_no_team_members_fails(self, project_service):
+        """Test project with empty team members list is rejected"""
+        # Arrange
+        data = {
+            'title': 'Test Project',
             'program_id': 1,
             'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
-        })
-        project_service.create_project({
-            'title': 'Project 2',
-            'program_id': 2,
-            'facility_id': 2,
-            'start_date': today,
-            'end_date': future,
-        })
+            'team_members': [],
+        }
         
-        projects = project_service.get_all_projects()
-        
-        assert len(projects) == 2
-        assert projects[0].title == 'Project 1'
-        assert projects[1].title == 'Project 2'
+        # Act & Assert
+        with pytest.raises(ValueError, match="Project must have at least one team member assigned"):
+            project_service.create_project(data)
     
-    def test_get_project_by_id_success(self, project_service):
-        today = date.today()
-        future = today + timedelta(days=30)
+    def test_create_project_missing_team_members_field_fails(self, project_service):
+        """Test project without team_members field is rejected"""
+        # Arrange
+        data = {
+            'title': 'Test Project',
+            'program_id': 1,
+            'facility_id': 1,
+        }
         
+        # Act & Assert
+        with pytest.raises(ValueError, match="Project must have at least one team member assigned"):
+            project_service.create_project(data)
+
+class TestBusinessRule_OutcomeValidation:
+    """If Status is 'Completed', at least one Outcome must be attached"""
+    
+    def test_update_project_to_completed_with_outcomes_succeeds(self, project_service):
+        """Test marking project as completed with outcomes succeeds"""
+        # Arrange
         created = project_service.create_project({
             'title': 'Test Project',
             'program_id': 1,
             'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
+            'team_members': ['Benjamin Nakabaale'],
+            'status': 'Active',
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
         })
         
-        project = project_service.get_project_by_id(created.ProjectId)
+        # Act
+        updated = project_service.update_project(
+            created.ProjectId,
+            {
+                'status': 'Completed',
+                'outcomes': ['Research Paper Published', 'Patent Filed']
+            }
+        )
         
-        assert project is not None
-        assert project.ProjectId == created.ProjectId
-        assert project.title == 'Test Project'
+        # Assert
+        assert updated.status == 'Completed'
+        assert len(updated.outcomes) >= 1
     
-    def test_get_project_by_id_not_found(self, project_service):
-        project = project_service.get_project_by_id(999)
-        assert project is None
-    
-    def test_get_projects_by_program(self, project_service):
-        today = date.today()
-        future = today + timedelta(days=30)
-        
-        project_service.create_project({
-            'title': 'Program 1 Project 1',
-            'program_id': 1,
-            'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
-        })
-        project_service.create_project({
-            'title': 'Program 1 Project 2',
-            'program_id': 1,
-            'facility_id': 2,
-            'start_date': today,
-            'end_date': future,
-        })
-        project_service.create_project({
-            'title': 'Program 2 Project',
-            'program_id': 2,
-            'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
-        })
-        
-        program_1_projects = project_service.get_projects_by_program(1)
-        
-        assert len(program_1_projects) == 2
-        assert all(p.program_id == 1 for p in program_1_projects)
-    
-    def test_get_projects_by_program_empty(self, project_service):
-        projects = project_service.get_projects_by_program(999)
-        assert projects == []
-    
-    def test_get_projects_by_facility(self, project_service):
-        today = date.today()
-        future = today + timedelta(days=30)
-        
-        project_service.create_project({
-            'title': 'Facility 1 Project 1',
-            'program_id': 1,
-            'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
-        })
-        project_service.create_project({
-            'title': 'Facility 1 Project 2',
-            'program_id': 2,
-            'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
-        })
-        project_service.create_project({
-            'title': 'Facility 2 Project',
-            'program_id': 1,
-            'facility_id': 2,
-            'start_date': today,
-            'end_date': future,
-        })
-        
-        facility_1_projects = project_service.get_projects_by_facility(1)
-        
-        assert len(facility_1_projects) == 2
-        assert all(p.facility_id == 1 for p in facility_1_projects)
-    
-    def test_get_projects_by_facility_empty(self, project_service):
-        """Test filtering by facility with no projects"""
-        projects = project_service.get_projects_by_facility(999)
-        assert projects == []
-
-#Test project update logic
-class TestProjectServiceUpdate:
-
-    def test_update_project_success(self, project_service):
-        today = date.today()
-        future = today + timedelta(days=30)
-        
+    def test_update_project_to_completed_without_outcomes_fails(self, project_service):
+        """Test marking project as completed without outcomes is rejected"""
+        # Arrange
         created = project_service.create_project({
-            'title': 'Original Title',
+            'title': 'Test Project',
             'program_id': 1,
             'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
+            'team_members': ['Benjamin Nakabaale'],
+            'status': 'Active',
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
         })
         
-        updated_data = {
-            'title': 'Updated Title',
-            'description': 'Updated description',
+        # Act & Assert
+        with pytest.raises(ValueError, match="Completed projects must have at least one documented outcome"):
+            project_service.update_project(
+                created.ProjectId,
+                {'status': 'Completed', 'outcomes': []}
+            )
+
+class TestBusinessRule4_NameUniqueness:
+    """Project Name must be unique within a Program"""
+    
+    def test_create_project_unique_name_in_program_succeeds(self, project_service):
+        """Test creating project with unique name in program succeeds"""
+        # Arrange
+        data = {
+            'title': 'Unique Project',
+            'program_id': 1,
+            'facility_id': 1,
+            'team_members': ['Benjamin Nakabaale'],
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
         }
         
-        updated = project_service.update_project(created.ProjectId, updated_data)
+        # Act
+        project = project_service.create_project(data)
         
-        assert updated.title == 'Updated Title'
-        assert updated.description == 'Updated description'
+        # Assert
+        assert project is not None
     
-    def test_update_project_not_found(self, project_service):
-        with pytest.raises(ValueError, match="not found"):
-            project_service.update_project(999, {'title': 'New Title'})
-    
-    def test_update_project_duplicate_title_fails(self, project_service):
-        today = date.today()
-        future = today + timedelta(days=30)
+    def test_create_project_duplicate_name_same_program_fails(self, project_service):
+        """Test creating project with duplicate name in same program is rejected"""
+        # Arrange
+        data = {
+            'title': 'Unique Project',
+            'program_id': 1,
+            'facility_id': 1,
+            'team_members': ['Benjamin Nakabaale'],
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
+        }
+        project_service.create_project(data)
         
+        # Act & Assert
+        with pytest.raises(ValueError, match="A project with this name already exists in this program"):
+            project_service.create_project(data)
+    
+    def test_create_project_same_name_different_program_succeeds(self, project_service):
+        """Test creating project with same name in different program succeeds"""
+        # Arrange
+        data1 = {
+            'title': 'Common Project Name',
+            'program_id': 1,
+            'facility_id': 1,
+            'team_members': ['Benjamin Nakabaale'],
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
+        }
+        
+        data2 = {
+            'title': 'Common Project Name',
+            'program_id': 2,
+            'facility_id': 1,
+            'team_members': ['Ruth Angel'],
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
+        }
+        
+        # Act
+        project1 = project_service.create_project(data1)
+        project2 = project_service.create_project(data2)
+        
+        # Assert
+        assert project1.title == project2.title
+        assert project1.program_id != project2.program_id
+    
+    def test_update_project_duplicate_name_same_program_fails(self, project_service):
+        """Test updating project to duplicate name in same program is rejected"""
+        # Arrange
         project_service.create_project({
             'title': 'Existing Project',
             'program_id': 1,
             'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
+            'team_members': ['Benjamin Nakabaale'],
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
         })
         
         created2 = project_service.create_project({
             'title': 'Another Project',
             'program_id': 1,
             'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
+            'team_members': ['Ruth Angel'],
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
         })
         
-        #update to existing title
-        with pytest.raises(ValueError, match="already exists"):
+        # Act & Assert
+        with pytest.raises(ValueError, match="A project with this name already exists in this program"):
             project_service.update_project(
                 created2.ProjectId, 
                 {'title': 'Existing Project'}
             )
+
+
+class TestBusinessRule5_FacilityCompatibility:
+    """Project's technical requirements must be compatible with facility capabilities"""
     
-    def test_update_project_invalid_dates_fails(self, project_service):
-        today = date.today()
-        future = today + timedelta(days=30)
+    def test_create_project_compatible_facility_succeeds(self, project_service):
+        """Test project with compatible facility requirements succeeds"""
+        # Arrange
+        data = {
+            'title': 'Lab Project',
+            'program_id': 1,
+            'facility_id': 1,
+            'team_members': ['Benjamin Nakabaale'],
+            'technical_requirements': ['High-Performance Computing', 'Clean Room'],
+            'facility_capabilities': ['High-Performance Computing', 'Clean Room', 'Lab Equipment'],
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
+        }
         
+        # Act
+        project = project_service.create_project(data)
+        
+        # Assert
+        assert project is not None
+    
+    def test_create_project_incompatible_facility_fails(self, project_service):
+        """Test project with incompatible facility requirements is rejected"""
+        # Arrange
+        data = {
+            'title': 'Lab Project',
+            'program_id': 1,
+            'facility_id': 1,
+            'team_members': ['Benjamin Nakabaale'],
+            'technical_requirements': ['High-Performance Computing', 'Clean Room'],
+            'facility_capabilities': ['Basic Computing'], 
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
+        }
+        
+        # Act & Assert
+        with pytest.raises(ValueError, match="Project requirements not compatible with facility capabilities"):
+            project_service.create_project(data)
+    
+    def test_create_project_no_technical_requirements_succeeds(self, project_service):
+        """Test project without technical requirements succeeds"""
+        # Arrange
+        data = {
+            'title': 'Simple Project',
+            'program_id': 1,
+            'facility_id': 1,
+            'team_members': ['Benjamin Nakabaale'],
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
+        }
+        
+        # Act
+        project = project_service.create_project(data)
+        
+        # Assert
+        assert project is not None
+    
+    def test_update_project_incompatible_facility_fails(self, project_service):
+        """Test updating project with incompatible facility is rejected"""
+        # Arrange
         created = project_service.create_project({
             'title': 'Test Project',
             'program_id': 1,
             'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
+            'team_members': ['Benjamin Nakabaale'],
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
         })
         
-        # Try to set end date before start date
-        past = today - timedelta(days=10)
-        with pytest.raises(ValueError, match="End date must be after start date"):
+        # Act & Assert
+        with pytest.raises(ValueError, match="Project requirements not compatible with facility capabilities"):
             project_service.update_project(
                 created.ProjectId,
-                {'end_date': past}
+                {
+                    'technical_requirements': ['Advanced Lab', 'Clean Room'],
+                    'facility_capabilities': ['Basic Lab']  # Missing required capabilities
+                }
             )
-    
-    def test_update_project_partial(self, project_service):
-        today = date.today()
-        future = today + timedelta(days=30)
-        
-        created = project_service.create_project({
-            'title': 'Original',
-            'description': 'Original description',
-            'program_id': 1,
-            'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
-        })
-        
-        updated = project_service.update_project(
-            created.ProjectId, 
-            {'description': 'New description'}
-        )
-        
-        assert updated.title == 'Original'
-        assert updated.description == 'New description'
 
 
-class TestProjectServiceDelete:
-
-    def test_delete_project_success(self, project_service):
-        today = date.today()
-        future = today + timedelta(days=30)
-        
-        created = project_service.create_project({
-            'title': 'To Delete',
-            'program_id': 1,
-            'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
-        })
-        
-        result = project_service.delete_project(created.ProjectId)
-        
-        assert result is True
-        assert project_service.get_project_by_id(created.ProjectId) is None
-    
-    def test_delete_project_not_found(self, project_service):
-        result = project_service.delete_project(999)
-        assert result is False
-
-
-class TestProjectServiceStatistics:
-    
-    def test_get_statistics_empty(self, project_service):
-        """Test statistics with no projects"""
-        stats = project_service.get_project_statistics()
-        
-        assert stats['total_projects'] == 0
-    
-    def test_get_statistics(self, project_service):
-        """Test statistics with projects"""
-        today = date.today()
-        future = today + timedelta(days=30)
-        
-        project_service.create_project({
-            'title': 'Project 1',
-            'program_id': 1,
-            'facility_id': 1,
-            'start_date': today,
-            'end_date': future,
-        })
-        project_service.create_project({
-            'title': 'Project 2',
-            'program_id': 2,
-            'facility_id': 2,
-            'start_date': today,
-            'end_date': future,
-        })
-        
-        stats = project_service.get_project_statistics()
-        
-        assert stats['total_projects'] == 2

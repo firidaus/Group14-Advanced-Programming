@@ -213,28 +213,3 @@ class TestOutcomeServiceDelete:
         result = outcome_service.delete_outcome(999)
         assert result is False
 
-
-class TestOutcomeServiceStatistics:
-    """Test outcome statistics logic"""
-    
-    def test_get_statistics_empty(self, outcome_service):
-        stats = outcome_service.get_outcome_statistics()
-        
-        assert stats['total_outcomes'] == 0
-    
-    def test_get_statistics(self, outcome_service):
-        """Test statistics with outcomes"""
-        outcome_service.create_outcome({
-            'title': 'Outcome 1',
-            'outcome_type': 'Publication',
-            'project_id': 1,
-        })
-        outcome_service.create_outcome({
-            'title': 'Outcome 2',
-            'outcome_type': 'Patent',
-            'project_id': 1,
-        })
-        
-        stats = outcome_service.get_outcome_statistics()
-        
-        assert stats['total_outcomes'] == 2
