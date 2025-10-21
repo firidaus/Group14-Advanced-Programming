@@ -5,9 +5,9 @@ Contains all business logic for Participant entity.
 Uses dependency injection for testability.
 
 Business Rules:
-- Participant full name is required
-- Contact info must be valid
-- Participants can be assigned to projects
+1. Required Fields: FullName, Email, and Affiliation must be provided
+2. Email Uniqueness: Email must be unique across all participants (case-insensitive)
+3. Specialization Requirement: CrossSkillTrained requires Specialization to be defined
 """
 
 from typing import Dict, List, Optional, Any
@@ -25,7 +25,7 @@ class ParticipantService:
         """Get all participants"""
         return self.repository.get_all()
     
-    def get_participant_by_id(self, participant_id: int) -> Optional:
+    def get_participant_by_id(self, participant_id: int) -> Optional[Any]:
         """Get participant by ID"""
         return self.repository.get_by_id(participant_id)
     
@@ -34,7 +34,9 @@ class ParticipantService:
         Create new participant with business validation.
         
         Business Rules:
-        - Full name is required (at least 3 characters)
+        1. Required Fields: FullName, Email, and Affiliation must be provided
+        2. Email Uniqueness: Email must be unique across all participants (case-insensitive)
+        3. Specialization Requirement: CrossSkillTrained requires Specialization
         
         Args:
             data: Participant data dictionary
@@ -45,18 +47,67 @@ class ParticipantService:
         Raises:
             ValueError: If business rules violated
         """
-        # Business Rule: Full name is required
-        full_name = data.get('full_name', '')
-        if len(full_name) < 3:
-            raise ValueError("Full name must be at least 3 characters")
+        # Business Rule #1: Required Fields
+        required_fields = ['full_name', 'email', 'affiliation']
+        missing_fields = [field for field in required_fields if not data.get(field)]
+        if missing_fields:
+            raise ValueError("Participant.FullName, Participant.Email, and Participant.Affiliation are required")
+
+        # Business Rule #2: Email Uniqueness
+        email = data['email']
+        for participant in self.repository.get_all():
+            if hasattr(participant, 'email') and participant.email.lower() == email.lower():
+                raise ValueError("Participant.Email already exists")
+
+        # Business Rule #3: Specialization Requirement
+        if data.get('cross_skill_trained') and not data.get('specialization'):
+            raise ValueError("Cannot set CrossSkillTrained without Specialization")
         
         return self.repository.create(data)
     
     def update_participant(self, participant_id: int, data: Dict[str, Any]):
-        """Update participant with business validation"""
+        """
+        Update participant with business validation.
+        
+        Business Rules:
+        1. Required Fields cannot be cleared
+        2. Email Uniqueness must be maintained
+        3. Specialization Requirement must be maintained
+        
+        Args:
+            participant_id: ID of participant to update
+            data: Updated participant data
+            
+        Returns:
+            Updated Participant object
+            
+        Raises:
+            ValueError: If business rules violated or participant not found
+        """
         participant = self.repository.get_by_id(participant_id)
         if not participant:
             raise ValueError(f"Participant with ID {participant_id} not found")
+        
+        # Business Rule #1: Required Fields can't be cleared
+        new_full_name = data.get('full_name', getattr(participant, 'full_name', None))
+        new_email = data.get('email', getattr(participant, 'email', None))
+        new_affiliation = data.get('affiliation', getattr(participant, 'affiliation', None))
+        
+        if not all([new_full_name, new_email, new_affiliation]):
+            raise ValueError("Participant.FullName, Participant.Email, and Participant.Affiliation are required")
+        
+        # Business Rule #2: Email Uniqueness
+        if new_email != getattr(participant, 'email', None):
+            for p in self.repository.get_all():
+                if p != participant and hasattr(p, 'email') and p.email.lower() == new_email.lower():
+                    raise ValueError("Participant.Email already exists")
+        
+        # Business Rule #3: Specialization Requirement
+        new_cross_skill = data.get('cross_skill_trained', getattr(participant, 'cross_skill_trained', False))
+        new_specialization = data.get('specialization', getattr(participant, 'specialization', None))
+        
+        if new_cross_skill and not new_specialization:
+            raise ValueError("Cannot set CrossSkillTrained without Specialization")
         
         return self.repository.update(participant, data)
     

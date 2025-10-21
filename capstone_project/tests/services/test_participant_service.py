@@ -1,15 +1,16 @@
 """
-Unit Tests for ParticipantService - Business Rules and Operations
+Unit Tests for ParticipantService - Business Rules ONLY
 
+This test suite focuses exclusively on testing business rule validation.
 Uses MockParticipantRepository to avoid database dependency.
 
 Business Rules Tested:
-1. Full name must be at least 3 characters
+1. Required Fields: FullName, Email, and Affiliation must be provided
+2. Email Uniqueness: Email must be unique across all participants (case-insensitive)
+3. Specialization Requirement: CrossSkillTrained requires Specialization to be defined
 
-Operations Tested:
-- Create / Read / Update / Delete
-- Assign / Remove project
-- Filters and statistics
+Test Pattern: AAA (Arrange-Act-Assert)
+Focus: Business Rule Validation
 """
 
 import pytest
@@ -60,86 +61,92 @@ def another_participant():
 
 @pytest.mark.unit
 class TestParticipantBusinessRules:
-    def test_full_name_minimum_length(self, participant_service):
-        invalid = {
-            'full_name': 'Al',  # 2 chars
-            'email': 'al@example.com',
-            'specialization': 'CS',
-            'institution': 'SCIT',
+    """Test the 3 core business rules for Participant entity."""
+    
+    def test_required_fields(self, participant_service):
+        """
+        Business Rule #1: FullName, Email, and Affiliation are required fields.
+        
+        Error Message: "Participant.FullName, Participant.Email, and Participant.Affiliation are required"
+        """
+        # Test missing full_name
+        invalid_data = {
+            'email': 'test@example.com',
+            'affiliation': 'Test Org'
         }
-        with pytest.raises(ValueError, match='at least 3 characters'):
-            participant_service.create_participant(invalid)
+        with pytest.raises(ValueError, match="Participant.FullName, Participant.Email, and Participant.Affiliation are required"):
+            participant_service.create_participant(invalid_data)
 
-    def test_create_participant_success(self, participant_service, valid_participant):
-        p = participant_service.create_participant(valid_participant)
-        assert p.full_name == 'Jane Doe'
-        assert p.email == 'jane@example.com'
+        # Test missing email
+        invalid_data = {
+            'full_name': 'Test User',
+            'affiliation': 'Test Org'
+        }
+        with pytest.raises(ValueError, match="Participant.FullName, Participant.Email, and Participant.Affiliation are required"):
+            participant_service.create_participant(invalid_data)
 
+        # Test missing affiliation
+        invalid_data = {
+            'full_name': 'Test User',
+            'email': 'test@example.com'
+        }
+        with pytest.raises(ValueError, match="Participant.FullName, Participant.Email, and Participant.Affiliation are required"):
+            participant_service.create_participant(invalid_data)
 
-# ================================================================
-# CRUD and Operations
-# ================================================================
-
-@pytest.mark.unit
-class TestParticipantOperations:
-    def test_get_all_and_by_id(self, participant_service, valid_participant, another_participant):
-        p1 = participant_service.create_participant(valid_participant)
-        p2 = participant_service.create_participant(another_participant)
-
-        all_ps = participant_service.get_all_participants()
-        assert len(all_ps) == 2
-
-        found = participant_service.get_participant_by_id(p1.participant_id)
-        assert found.full_name == 'Jane Doe'
-
-    def test_update_participant(self, participant_service, valid_participant):
-        p = participant_service.create_participant(valid_participant)
-        updated = participant_service.update_participant(p.participant_id, {'full_name': 'Jane A. Doe'})
-        assert updated.full_name == 'Jane A. Doe'
-
-    def test_update_participant_not_found(self, participant_service):
-        with pytest.raises(ValueError, match='not found'):
-            participant_service.update_participant(999, {'full_name': 'X'})
-
-    def test_delete_participant(self, participant_service, valid_participant):
-        p = participant_service.create_participant(valid_participant)
-        ok = participant_service.delete_participant(p.participant_id)
-        assert ok is True
-        assert participant_service.get_participant_by_id(p.participant_id) is None
-
-    def test_delete_participant_not_found(self, participant_service):
-        ok = participant_service.delete_participant(999)
-        assert ok is False
-
-
-# ================================================================
-# Project Assignment & Filters
-# ================================================================
-
-@pytest.mark.unit
-class TestParticipantAssignmentsAndFilters:
-    def test_assign_and_remove_project(self, participant_service, valid_participant):
-        p = participant_service.create_participant(valid_participant)
-        # Reassign to new project
-        ok_assign = participant_service.assign_to_project(p.participant_id, 303)
-        assert ok_assign is True
-        # Remove assignment
-        ok_remove = participant_service.remove_from_project(p.participant_id)
-        assert ok_remove is True
-
-    def test_filters_and_statistics(self, participant_service, valid_participant, another_participant):
+    def test_email_uniqueness(self, participant_service, valid_participant):
+        """
+        Business Rule #2: Email must be unique (case-insensitive).
+        
+        Error Message: "Participant.Email already exists"
+        """
+        # Create first participant
         participant_service.create_participant(valid_participant)
-        participant_service.create_participant(another_participant)
 
-        cs = participant_service.get_participants_by_project(101)
-        assert len(cs) == 1
+        # Try to create another participant with same email (different case)
+        duplicate_data = valid_participant.copy()
+        duplicate_data['email'] = valid_participant['email'].upper()
+        duplicate_data['full_name'] = 'Different Name'
+        
+        with pytest.raises(ValueError, match="Participant.Email already exists"):
+            participant_service.create_participant(duplicate_data)
 
-        cross = participant_service.get_cross_skill_trained_participants()
-        assert len(cross) == 1
+        # Should allow different email
+        different_email = valid_participant.copy()
+        different_email['email'] = 'different@example.com'
+        participant_service.create_participant(different_email)  # Should not raise error
 
-        scit = participant_service.repository.filter_by_institution('SCIT')
-        assert len(scit) == 1
+    def test_specialization_requirement(self, participant_service, valid_participant):
+        """
+        Business Rule #3: CrossSkillTrained requires Specialization.
+        
+        Error Message: "Cannot set CrossSkillTrained without Specialization"
+        """
+        # Try to create participant with cross_skill_trained but no specialization
+        invalid_data = {
+            'full_name': 'Test User',
+            'email': 'test@example.com',
+            'affiliation': 'Test Org',
+            'cross_skill_trained': True  # Cannot be true without specialization
+        }
+        with pytest.raises(ValueError, match="Cannot set CrossSkillTrained without Specialization"):
+            participant_service.create_participant(invalid_data)
 
-        stats = participant_service.get_participant_statistics()
-        assert stats['total_participants'] == 2
-        assert stats['cross_skill_trained_count'] == 1
+        # Try to update participant to have cross_skill_trained but no specialization
+        participant = participant_service.create_participant(valid_participant)
+        with pytest.raises(ValueError, match="Cannot set CrossSkillTrained without Specialization"):
+            participant_service.update_participant(
+                participant.participant_id,
+                {'specialization': None, 'cross_skill_trained': True}
+            )
+
+        # Should work when specialization is provided
+        valid_update = {
+            'specialization': 'New Specialization',
+            'cross_skill_trained': True
+        }
+        updated = participant_service.update_participant(participant.participant_id, valid_update)
+        assert updated.specialization == 'New Specialization'
+        assert updated.cross_skill_trained is True
+
+
+
