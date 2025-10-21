@@ -19,6 +19,7 @@ django.setup()
 # Import after Django setup
 from core.repositories.mock_program_repository import MockProgramRepository
 from core.repositories.mock_facility_repository import MockFacilityRepository
+from core.repositories.mock_equipment_repository import MockEquipmentRepository
 from core.services import (
     ProgramService, FacilityService, ProjectService, ServiceService,
     EquipmentService, ParticipantService, OutcomeService
@@ -41,6 +42,13 @@ def facility_service():
     """Create FacilityService with mock repository for testing."""
     mock_repo = MockFacilityRepository()
     return FacilityService(mock_repo)
+
+
+@pytest.fixture
+def equipment_service():
+    """Create EquipmentService with mock repository for testing."""
+    mock_repo = MockEquipmentRepository()
+    return EquipmentService(mock_repo)
 
 
 # ============================================================================
