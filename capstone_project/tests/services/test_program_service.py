@@ -5,9 +5,10 @@ This test suite focuses exclusively on testing business rule validation.
 Uses Mock Repository for isolation (no database dependency).
 
 Business Rules Tested:
-1. Program name must be unique
-2. Program name must be at least 3 characters
-3. End date must be after start date
+1. Required Fields: Name and Description must be provided
+2. Uniqueness: Program Name must be unique (case-insensitive)
+3. National Alignment: When FocusAreas is non-empty, NationalAlignment must have valid token
+4. Lifecycle Protection: Programs cannot be deleted if they have Projects
 
 Test Pattern: AAA (Arrange-Act-Assert)
 Isolation: MockProgramRepository (No Database)
@@ -41,7 +42,7 @@ def valid_program_data():
     return {
         'name': 'Innovation Program 2024',
         'description': 'Accelerating innovation through collaboration',
-        'national_alignment': 'National Innovation Strategy',
+        'national_alignment': 'NDPIII, DigitalRoadmap2023_2028',
         'focus_areas': 'AI, Robotics, IoT',
         'phases': 'Cross-Skilling',
         'start_date': date(2024, 1, 1),
@@ -50,29 +51,73 @@ def valid_program_data():
     }
 
 
-# ============================================================================
-# BUSINESS RULE TESTS - Program Creation
-# ============================================================================
-
 @pytest.mark.unit
 class TestProgramBusinessRules:
-    """Test the 3 core business rules for Program entity."""
+    """Test the 4 core business rules for Program entity."""
     
-    def test_program_name_must_be_unique(self, program_service):
+    def test_required_fields_name_missing(self, program_service):
         """
-        Business Rule #1: Program name must be unique.
+        Business Rule #1: Required Fields - Name must be provided.
+        
+        Regression: Prevents creation of programs without names.
+        
+        Arrange: Program data with empty name
+        Act: Attempt to create program
+        Assert: ValueError raised with 'Program.Name is required.' message
+        """
+        # Arrange
+        invalid_program = {
+            'name': '',  # Empty name - INVALID!
+            'description': 'Valid description',
+            'national_alignment': 'NDPIII',
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
+            'active': True
+        }
+        
+        # Act & Assert
+        with pytest.raises(ValueError, match="Program.Name is required."):
+            program_service.create_program(invalid_program)
+    
+    def test_required_fields_description_missing(self, program_service):
+        """
+        Business Rule #1: Required Fields - Description must be provided.
+        
+        Regression: Prevents creation of programs without descriptions.
+        
+        Arrange: Program data with empty description
+        Act: Attempt to create program
+        Assert: ValueError raised with 'Program.Description is required.' message
+        """
+        # Arrange
+        invalid_program = {
+            'name': 'Valid Program Name',
+            'description': '',  # Empty description - INVALID!
+            'national_alignment': 'NDPIII',
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
+            'active': True
+        }
+        
+        # Act & Assert
+        with pytest.raises(ValueError, match="Program.Description is required."):
+            program_service.create_program(invalid_program)
+    
+    def test_uniqueness_duplicate_name(self, program_service):
+        """
+        Business Rule #2: Uniqueness - Program name must be unique.
         
         Regression: Prevents duplicate program names in the system.
         
         Arrange: Create first program with a specific name
         Act: Attempt to create second program with same name
-        Assert: ValueError raised with 'already exists' message
+        Assert: ValueError raised with 'Program.Name already exists.' message
         """
         # Arrange - Create first program
         first_program = {
             'name': 'Machine Learning Program',
             'description': 'ML research and development',
-            'national_alignment': 'Digital Economy',
+            'national_alignment': 'NDPIII',  # Fixed: Use valid token
             'focus_areas': 'Machine Learning, AI',
             'phases': 'Prototyping',
             'start_date': date(2024, 1, 1),
@@ -85,60 +130,71 @@ class TestProgramBusinessRules:
         duplicate_program = {
             'name': 'Machine Learning Program',  # Same name!
             'description': 'Different description',
+            'national_alignment': '4IR',  # Valid token
             'start_date': date(2024, 7, 1),
             'end_date': date(2024, 12, 31),
             'active': True
         }
         
-        with pytest.raises(ValueError, match="already exists"):
+        with pytest.raises(ValueError, match="Program.Name already exists."):
             program_service.create_program(duplicate_program)
     
-    def test_program_name_minimum_length(self, program_service):
+    def test_national_alignment_required_when_focus_areas_specified(self, program_service):
         """
-        Business Rule #2: Program name must be at least 3 characters.
+        Business Rule #3: National Alignment - When FocusAreas is non-empty,
+        NationalAlignment must reference at least one valid alignment token.
         
-        Regression: Prevents meaningless single/double character names.
-        Bug Reference: Issue #42
+        Regression: Ensures programs with focus areas align with national strategies.
         
-        Arrange: Program data with 2-character name
+        Arrange: Program with focus_areas but no national_alignment
         Act: Attempt to create program
-        Assert: ValueError raised with 'at least 3 characters' message
+        Assert: ValueError raised with appropriate message
         """
         # Arrange
         invalid_program = {
-            'name': 'AI',  # Only 2 characters - INVALID!
-            'description': 'Artificial Intelligence program',
-            'national_alignment': 'Innovation Strategy',
+            'name': 'AI Innovation Program',
+            'description': 'Artificial Intelligence focused program',
+            'national_alignment': '',  # Empty - INVALID when focus_areas specified!
+            'focus_areas': 'AI, Machine Learning',  # Has focus areas
             'start_date': date(2024, 1, 1),
             'end_date': date(2024, 12, 31),
             'active': True
         }
         
         # Act & Assert
-        with pytest.raises(ValueError, match="at least 3 characters"):
+        with pytest.raises(ValueError, match="Program.NationalAlignment must include at least one recognized"):
             program_service.create_program(invalid_program)
     
-    def test_end_date_must_be_after_start_date(self, program_service):
+    def test_lifecycle_protection_cannot_delete_with_projects(self, program_service):
         """
-        Business Rule #3: End date must be after start date.
+        Business Rule #4: Lifecycle Protection - Programs cannot be deleted
+        if they have associated Projects.
         
-        Regression: Prevents illogical date ranges (end before start).
+        Regression: Prevents orphaning of Project entities and maintains data integrity.
         
-        Arrange: Program with end_date before start_date
-        Act: Attempt to create program
-        Assert: ValueError raised with 'End date must be after start date' message
+        Arrange: Create program and mock it to have associated projects
+        Act: Attempt to delete program
+        Assert: ValueError raised with 'Program has Projects; archive or reassign before delete.' message
         """
-        # Arrange
-        invalid_program = {
-            'name': 'Invalid Date Program',
-            'description': 'Testing date validation',
-            'national_alignment': 'Test Alignment',
-            'focus_areas': 'Testing',
-            'start_date': date(2024, 12, 31),  # December 31
-            'end_date': date(2024, 1, 1),      # January 1 - BEFORE START!
+        # Arrange - Create program
+        program_data = {
+            'name': 'Program With Projects',
+            'description': 'This program has projects',
+            'national_alignment': 'NDPIII',
+            'start_date': date(2024, 1, 1),
+            'end_date': date(2024, 12, 31),
             'active': True
         }
+        program = program_service.create_program(program_data)
+        
+        # Mock: Simulate that program has associated projects
+        # Create a mock project_set with exists() method
+        class MockProjectSet:
+            def exists(self):
+                return True  # Simulate having projects
+        
+        program.project_set = MockProjectSet()
         
         # Act & Assert
-        with pytest.raises(ValueError, match="End date must be after start date"):
-            program_service.create_program(invalid_program)
+        with pytest.raises(ValueError, match="Program has Projects; archive or reassign before delete."):
+            program_service.delete_program(program.id)  # Use .id not .ProgramId

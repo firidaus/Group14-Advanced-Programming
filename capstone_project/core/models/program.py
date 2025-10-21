@@ -2,6 +2,22 @@ from django.db import models
 
 
 class Program(models.Model):
+        NATIONAL_ALIGNMENT_CHOICES = [
+    ('NDPIII', 'NDPIII - National Development Plan III'),
+    ('DigitalRoadmap2023_2028', 'Digital Roadmap 2023-2028'),
+    ('4IR', '4IR - Fourth Industrial Revolution'),
+]
+        
+        FOCUS_AREAS_CHOICES = [
+    ('IoT', 'Internet of Things (IoT)'),
+    ('Automation', 'Automation'),
+    ('Renewable Energy', 'Renewable Energy'),
+    ('AI', 'Artificial Intelligence'),
+    ('Machine Learning', 'Machine Learning'),
+    ('Robotics', 'Robotics'),
+    ('Smart Cities', 'Smart Cities'),
+]
+        
         PHASES_CHOICES = [
     ('Cross-Skilling', 'Cross-Skilling'),
     ('Collaboration', 'Collaboration'),
@@ -12,8 +28,8 @@ class Program(models.Model):
         ProgramId = models.AutoField(primary_key=True)
         name = models.CharField(max_length=200, unique=True)
         description = models.TextField(blank=True)
-        national_alignment = models.CharField(max_length=200, blank=True)
-        focus_areas = models.TextField(blank=True)
+        national_alignment = models.CharField(max_length=50, choices=NATIONAL_ALIGNMENT_CHOICES, blank=True)
+        focus_areas = models.CharField(max_length=50, choices=FOCUS_AREAS_CHOICES, blank=True)
         phases = models.CharField(max_length=50, choices=PHASES_CHOICES, blank=True)
         
         start_date = models.DateField(null=True, blank=True)

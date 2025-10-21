@@ -1,16 +1,15 @@
 """
 Unit Tests for EquipmentService - Business Rules ONLY
 
-This test suite focuse        from django.core.exceptions import ValidationError
-        with pytest.raises(ValidationError, match="Inventory code.*already exists"):
-            equipment_service.create_equipment(duplicate_equipment)exclusively on testing business rule validation.
+This test suite focuses exclusively on testing business rule validation.
 Uses Mock Repository for isolation (no database dependency).
 
-Business Rules Tested:
-1. Unique inventory code
-2. Belongs to one facility  
-3. Cannot delete equipment linked to active projects
-4. Valid domain and support phase choices
+Business Rules Tested (from Table 1.2):
+1. Required Fields: FacilityId, Name, and InventoryCode must be provided
+2. Uniqueness: InventoryCode must be unique across all Equipment
+3. UsageDomain-SupportPhase Coherence: If UsageDomain is Electronics, 
+   then SupportPhase must include Prototyping or Testing (cannot be Training only)
+4. Delete Guard: Equipment cannot be deleted if referenced by an active Project
 
 Test Pattern: AAA (Arrange-Act-Assert)
 Isolation: MockEquipmentRepository (No Database)
@@ -39,13 +38,13 @@ def equipment_service():
 
 
 @pytest.fixture
-def another_equipment_data():
-    """Different valid equipment data for testing scenarios."""
+def valid_equipment_data():
+    """Valid equipment data matching actual Equipment model fields."""
     return {
-        'name': '3D Printer Delta',
-        'description': 'Professional 3D printing system',
-        'capabilities': 'PLA, ABS, PETG printing',
-        'inventory_code': 'EQ002',
+        'name': 'CNC Milling Machine',
+        'description': 'High-precision CNC machine',
+        'capabilities': 'Metal, Wood, Plastic milling',
+        'inventory_code': 'EQ001',
         'usage_domain': 'Prototyping',
         'support_phase': 'Design',
         'facility_id': 1
@@ -58,74 +57,130 @@ def another_equipment_data():
 
 @pytest.mark.unit
 class TestEquipmentBusinessRules:
-    """Test the 4 core business rules for Equipment entity."""
+    """Test the 4 core business rules for Equipment entity (Table 1.2)."""
     
-    def test_unique_inventory_code(self, equipment_service, valid_equipment_data):
+    def test_required_fields_all_missing(self, equipment_service):
         """
-        Business Rule #1: Unique inventory code - Prevent duplicates.
+        Business Rule #1: Required Fields - FacilityId, Name, and InventoryCode must be provided.
+        
+        Regression: Prevents creation of equipment without required fields.
+        
+        Arrange: Equipment data missing all required fields
+        Act: Attempt to create equipment
+        Assert: ValidationError raised with required fields message
+        """
+        from django.core.exceptions import ValidationError
+        
+        # Arrange - Missing all required fields
+        invalid_equipment = {
+            'description': 'Equipment without required fields',
+            'capabilities': 'Various capabilities'
+            # Missing: facility_id, name, inventory_code - INVALID!
+        }
+        
+        # Act & Assert
+        with pytest.raises(ValidationError, match="Equipment.FacilityId, Equipment.Name, and Equipment.InventoryCode are required"):
+            equipment_service.create_equipment(invalid_equipment)
+    
+    def test_uniqueness_duplicate_inventory_code(self, equipment_service, valid_equipment_data):
+        """
+        Business Rule #2: Uniqueness - InventoryCode must be unique across all Equipment.
         
         Regression: Prevents duplicate inventory codes in the system.
         
         Arrange: Create first equipment with specific inventory code
         Act: Attempt to create second equipment with same inventory code
-        Assert: ValidationError raised with 'already exists' message
+        Assert: ValidationError raised with 'Equipment.InventoryCode already exists' message
         """
         from django.core.exceptions import ValidationError
         
-        # Arrange - Clear mock data and create first equipment
-        equipment_service.repository.clear()
+        # Arrange - Create first equipment
         equipment_service.create_equipment(valid_equipment_data)
         
         # Act & Assert - Try to create duplicate inventory code
         duplicate_equipment = {
             'name': 'Different Equipment Name',
-            'inventory_code': 'EQ001',  # Same inventory code!
+            'inventory_code': 'EQ001',  # Same inventory code - INVALID!
             'description': 'Different description',
             'capabilities': 'Different capabilities',
-            'usage_domain': 'Research',
-            'support_phase': 'Design',
+            'usage_domain': 'Prototyping',
+            'support_phase': 'Testing',
             'facility_id': 1
         }
         
-        with pytest.raises(ValidationError, match="Inventory code.*already exists"):
+        with pytest.raises(ValidationError, match="Equipment.InventoryCode already exists"):
             equipment_service.create_equipment(duplicate_equipment)
     
-    def test_belongs_to_one_facility(self, equipment_service):
+    def test_usage_domain_support_phase_coherence_electronics_invalid_phase(self, equipment_service):
         """
-        Business Rule #2: Belongs to one facility - Validate linkage.
+        Business Rule #3: UsageDomain-SupportPhase Coherence - Electronics equipment 
+        must support Prototyping or Testing.
         
-        Regression: Ensures equipment is properly linked to a facility.
+        Regression: Prevents Electronics equipment from supporting invalid phases.
         
-        Arrange: Equipment data without facility_id
-        Act: Attempt to create equipment  
-        Assert: ValueError raised with 'facility is required' message
+        Arrange: Electronics equipment with Training support phase
+        Act: Attempt to create equipment
+        Assert: ValidationError raised with coherence violation message
         """
-        # Arrange
+        from django.core.exceptions import ValidationError
+        
+        # Arrange - Electronics with Training phase (INVALID!)
         invalid_equipment = {
-            'name': 'Orphaned Equipment',
+            'name': 'Electronics Equipment',
             'inventory_code': 'EQ002',
-            'description': 'Equipment without facility',
-            'capabilities': 'Various capabilities',
-            'usage_domain': 'Research',
-            'support_phase': 'Design'
-            # Missing facility_id - INVALID!
+            'description': 'Electronics for training',
+            'capabilities': 'Circuits and sensors',
+            'usage_domain': 'Electronics',  # Electronics...
+            'support_phase': 'Training',    # ...but Training phase - INVALID!
+            'facility_id': 1
         }
         
         # Act & Assert
-        from django.core.exceptions import ValidationError
-        with pytest.raises(ValidationError, match="must be linked to a facility"):
+        with pytest.raises(ValidationError, match="Electronics equipment must support Prototyping or Testing"):
             equipment_service.create_equipment(invalid_equipment)
     
-    def test_cannot_delete_equipment_linked_to_active_projects(self, equipment_service, valid_equipment_data):
+    def test_usage_domain_support_phase_coherence_electronics_valid_prototyping(self, equipment_service):
         """
-        Business Rule #3: Cannot delete equipment linked to active projects - Data consistency rule.
+        Business Rule #3: UsageDomain-SupportPhase Coherence - Electronics equipment 
+        CAN support Prototyping (positive test).
+        
+        Regression: Verifies Electronics with Prototyping is valid.
+        
+        Arrange: Electronics equipment with Prototyping support phase
+        Act: Create equipment
+        Assert: Equipment created successfully
+        """
+        # Arrange - Electronics with Prototyping (VALID!)
+        valid_equipment = {
+            'name': 'Electronics Equipment',
+            'inventory_code': 'EQ003',
+            'description': 'Electronics for prototyping',
+            'capabilities': 'Circuits and sensors',
+            'usage_domain': 'Electronics',
+            'support_phase': 'Prototyping',  # Valid!
+            'facility_id': 1
+        }
+        
+        # Act
+        equipment = equipment_service.create_equipment(valid_equipment)
+        
+        # Assert
+        assert equipment is not None
+        assert equipment.usage_domain == 'Electronics'
+        assert equipment.support_phase == 'Prototyping'
+    
+    def test_delete_guard_equipment_referenced_by_active_project(self, equipment_service, valid_equipment_data):
+        """
+        Business Rule #4: Delete Guard - Cannot delete equipment referenced by active Project.
         
         Regression: Prevents deletion of equipment still in use by active projects.
         
         Arrange: Create equipment and link it to an active project
         Act: Attempt to delete the equipment
-        Assert: ValueError raised with 'linked to active projects' message
+        Assert: ValidationError raised with 'Equipment referenced by active Project' message
         """
+        from django.core.exceptions import ValidationError
+        
         # Arrange - Create equipment
         equipment = equipment_service.create_equipment(valid_equipment_data)
         
@@ -133,46 +188,6 @@ class TestEquipmentBusinessRules:
         equipment_service.repository.link_to_project(equipment.equipment_id, project_id=1, active=True)
         
         # Act & Assert
-        from django.core.exceptions import ValidationError
-        with pytest.raises(ValidationError, match="assigned to active projects"):
+        with pytest.raises(ValidationError, match="Equipment referenced by active Project"):
             equipment_service.delete_equipment(equipment.equipment_id)
-    
-    def test_valid_domain_and_support_phase_choices(self, equipment_service):
-        """
-        Business Rule #4: Valid domain and support phase choices - Ensure controlled values.
-        
-        Regression: Ensures only valid domain and support phase values are accepted.
-        
-        Arrange: Equipment data with invalid usage_domain
-        Act: Attempt to create equipment
-        Assert: ValueError raised with 'invalid usage domain' message
-        """
-        # Test invalid usage_domain
-        invalid_domain_equipment = {
-            'name': 'Test Equipment',
-            'inventory_code': 'EQ003',
-            'description': 'Test equipment with invalid domain',
-            'capabilities': 'Testing capabilities',
-            'usage_domain': 'InvalidDomain',  # INVALID!
-            'support_phase': 'Design',
-            'facility_id': 1
-        }
-        
-        from django.core.exceptions import ValidationError
-        with pytest.raises(ValidationError, match="Invalid usage_domain"):
-            equipment_service.create_equipment(invalid_domain_equipment)
-        
-        # Test invalid support_phase
-        invalid_phase_equipment = {
-            'name': 'Test Equipment 2',
-            'inventory_code': 'EQ004',
-            'description': 'Test equipment with invalid phase',
-            'capabilities': 'Testing capabilities',
-            'usage_domain': 'Research',
-            'support_phase': 'InvalidPhase',  # INVALID!
-            'facility_id': 1
-        }
-        
-        with pytest.raises(ValidationError, match="Invalid support_phase"):
-            equipment_service.create_equipment(invalid_phase_equipment)
 

@@ -58,9 +58,11 @@ class ProgramService:
         Create a new program with business validation.
         
         Business Rules:
-        - Name must be unique
-        - Name must be at least 3 characters
-        - End date must be after start date
+        1. Required Fields: Name and Description must be provided
+        2. Uniqueness: Program Name must be unique (case-insensitive)
+        3. National Alignment: When FocusAreas is non-empty, NationalAlignment 
+           must reference at least one valid alignment token
+        4. Lifecycle Protection: Programs cannot be deleted if they have Projects
         
         Args:
             data: Dictionary with program fields (from form.cleaned_data)
@@ -71,22 +73,41 @@ class ProgramService:
         Raises:
             ValueError: If business rules are violated
         """
-        # Business Rule #1: Name must be at least 3 characters
-        name = data.get('name', '')
-        if len(name) < 3:
-            raise ValueError("Program name must be at least 3 characters")
+        # Business Rule #1: Required Fields - Name and Description
+        name = data.get('name', '').strip()
+        description = data.get('description', '').strip()
         
-        # Business Rule #2: No duplicate names
+        if not name:
+            raise ValueError("Program.Name is required.")
+        
+        if not description:
+            raise ValueError("Program.Description is required.")
+        
+        # Business Rule #2: Uniqueness - Program name must be unique (case-insensitive)
         if self.repository.exists_by_name(name):
-            raise ValueError(f"Program with name '{name}' already exists")
+            raise ValueError("Program.Name already exists.")
         
-        # Business Rule #3: End date must be after start date
-        start_date = data.get('start_date')
-        end_date = data.get('end_date')
+        # Business Rule #3: National Alignment - When FocusAreas is specified, 
+        # NationalAlignment must contain at least one recognized token
+        focus_areas = data.get('focus_areas', '').strip()
+        national_alignment = data.get('national_alignment', '').strip()
         
-        if start_date and end_date:
-            if end_date <= start_date:
-                raise ValueError("End date must be after start date")
+        if focus_areas:  # If focus areas are specified
+            if not national_alignment:
+                raise ValueError(
+                    "Program.NationalAlignment must include at least one recognized "
+                    "alignment when FocusAreas are specified."
+                )
+            
+            # Check if at least one valid token exists
+            valid_tokens = ['NDPIII', 'DigitalRoadmap2023_2028', '4IR']
+            has_valid_token = any(token in national_alignment for token in valid_tokens)
+            
+            if not has_valid_token:
+                raise ValueError(
+                    "Program.NationalAlignment must include at least one recognized "
+                    "alignment when FocusAreas are specified."
+                )
         
         # All validations passed - create program
         return self.repository.create(data)
@@ -128,15 +149,25 @@ class ProgramService:
         """
         Delete a program.
         
+        Business Rule #4: Lifecycle Protection
+        - Programs cannot be deleted if they have associated Projects
+        
         Args:
             program_id: ID of program to delete
             
         Returns:
-            True if deleted, False if not found
+            True if deleted
+            
+        Raises:
+            ValueError: If program not found or has associated projects
         """
         program = self.repository.get_by_id(program_id)
         if not program:
-            return False
+            raise ValueError(f"Program with ID {program_id} not found")
+        
+        # Business Rule #4: Lifecycle Protection - Check for associated Projects
+        if hasattr(program, 'project_set') and program.project_set.exists():
+            raise ValueError("Program has Projects; archive or reassign before delete.")
         
         self.repository.delete(program)
         return True
