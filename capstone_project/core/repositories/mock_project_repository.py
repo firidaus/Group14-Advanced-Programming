@@ -64,6 +64,14 @@ class MockProjectRepository:
             for p in self.projects
         )
     
+    def exists_by_title_in_program(self, title: str, program_id: int) -> bool:
+        """Check if a project with given title exists in a specific program"""
+        return any(
+            hasattr(p, 'title') and hasattr(p, 'program_id') and
+            p.title.lower() == title.lower() and p.program_id == program_id
+            for p in self.projects
+        )
+    
     def count(self) -> int:
         return len(self.projects)
     
