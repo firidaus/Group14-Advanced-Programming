@@ -4,11 +4,12 @@ Equipment Service
 Contains all business logic for Equipment entity.
 Uses dependency injection for testability.
 
-Business Rules:
-1. Equipment must have unique inventory codes within the system
-2. Equipment must be linked to an existing facility
-3. Equipment cannot be deleted if assigned to active projects
-4. Equipment must have valid usage_domain and support_phase values
+Business Rules (from Table 1.2):
+1. Required Fields: FacilityId, Name, and InventoryCode must be provided
+2. Uniqueness: InventoryCode must be unique across all Equipment
+3. UsageDomain-SupportPhase Coherence: If UsageDomain is Electronics, 
+   then SupportPhase must include Prototyping or Testing (cannot be Training only)
+4. Delete Guard: Equipment cannot be deleted if referenced by an active Project
 """
 
 from typing import Dict, List, Optional, Any, TYPE_CHECKING
@@ -39,10 +40,11 @@ class EquipmentService:
         """
         Create new equipment with business validation.
         
-        Business Rules:
-        1. Equipment must have unique inventory codes within the system
-        2. Equipment must be linked to an existing facility
-        3. Equipment must have valid usage_domain and support_phase values
+        Business Rules (from Table 1.2):
+        1. Required Fields: FacilityId, Name, and InventoryCode must be provided
+        2. Uniqueness: InventoryCode must be unique across all Equipment
+        3. UsageDomain-SupportPhase Coherence: Electronics equipment must support 
+           Prototyping or Testing
         
         Args:
             data: Equipment data dictionary
@@ -53,27 +55,32 @@ class EquipmentService:
         Raises:
             ValidationError: If business rules violated
         """
-        # Business Rule 1: Unique inventory codes
-        inventory_code = data.get('inventory_code')
-        if inventory_code and self.repository.exists_by_inventory_code(inventory_code):
-            raise ValidationError(f"Inventory code '{inventory_code}' already exists")
-        
-        # Business Rule 2: Equipment must be linked to a facility
+        # Business Rule #1: Required Fields - FacilityId, Name, and InventoryCode
         facility_id = data.get('facility_id')
+        name = data.get('name', '').strip()
+        inventory_code = data.get('inventory_code', '').strip()
+        
         if not facility_id:
-            raise ValidationError("Equipment must be linked to a facility")
+            raise ValidationError("Equipment.FacilityId, Equipment.Name, and Equipment.InventoryCode are required.")
         
-        # Business Rule 4: Valid usage_domain and support_phase choices
-        valid_domains = ['Research', 'Production', 'Prototyping', 'Testing']
-        valid_phases = ['Design', 'Development', 'Production', 'Maintenance']
+        if not name:
+            raise ValidationError("Equipment.FacilityId, Equipment.Name, and Equipment.InventoryCode are required.")
         
-        usage_domain = data.get('usage_domain')
-        if usage_domain and usage_domain not in valid_domains:
-            raise ValidationError(f"Invalid usage_domain '{usage_domain}'. Must be one of: {valid_domains}")
+        if not inventory_code:
+            raise ValidationError("Equipment.FacilityId, Equipment.Name, and Equipment.InventoryCode are required.")
         
-        support_phase = data.get('support_phase')
-        if support_phase and support_phase not in valid_phases:
-            raise ValidationError(f"Invalid support_phase '{support_phase}'. Must be one of: {valid_phases}")
+        # Business Rule #2: Uniqueness - InventoryCode must be unique
+        if self.repository.exists_by_inventory_code(inventory_code):
+            raise ValidationError("Equipment.InventoryCode already exists.")
+        
+        # Business Rule #3: UsageDomain-SupportPhase Coherence
+        # If UsageDomain is Electronics, SupportPhase must include Prototyping or Testing
+        usage_domain = data.get('usage_domain', '').strip()
+        support_phase = data.get('support_phase', '').strip()
+        
+        if usage_domain == 'Electronics':
+            if support_phase not in ['Prototyping', 'Testing']:
+                raise ValidationError("Electronics equipment must support Prototyping or Testing.")
         
         return self.repository.create(data)
     
@@ -89,8 +96,8 @@ class EquipmentService:
         """
         Delete equipment with business validation.
         
-        Business Rules:
-        3. Equipment cannot be deleted if assigned to active projects
+        Business Rule #4 (Delete Guard):
+        Equipment cannot be deleted if referenced by an active Project in the same Facility
         
         Args:
             equipment_id: ID of equipment to delete
@@ -99,15 +106,15 @@ class EquipmentService:
             True if deleted successfully
             
         Raises:
-            ValidationError: If equipment is assigned to active projects
+            ValidationError: If equipment is referenced by active projects
         """
         equipment = self.repository.get_by_id(equipment_id)
         if not equipment:
-            return False
+            raise ValidationError(f"Equipment with ID {equipment_id} not found")
         
-        # Business Rule 3: Check if equipment is assigned to active projects
+        # Business Rule #4: Delete Guard - Check if equipment is referenced by active projects
         if hasattr(self.repository, 'is_equipment_in_use') and self.repository.is_equipment_in_use(equipment_id):
-            raise ValidationError("Cannot delete equipment that is assigned to active projects")
+            raise ValidationError("Equipment referenced by active Project.")
         
         self.repository.delete(equipment)
         return True
